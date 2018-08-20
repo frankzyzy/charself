@@ -50,8 +50,8 @@ function connect(){
 	websocket.onmessage = function (event) {
 		console.log(event);
 		var data = $.parseJSON(event.data);
-		var stringTime = hssduc.util.DateUtils.formatTimeStamp(data.sendMessageTime,"yyyy-MM-dd HH:mm:ss")
-	    setMessageInnerHTML(stringTime +" : "+ data.msg);
+		var stringTime = hssduc.util.DateUtils.formatTimeStamp(data.sendMsgTime,"yyyy-MM-dd HH:mm:ss")
+	    setMessageInnerHTML("发送者："+data.fromUserName+" 时间："+stringTime +" : "+ data.msg);
 	}
 	
 	//连接关闭的回调方法

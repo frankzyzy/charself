@@ -11,6 +11,12 @@ public class Message {
 	private String toUserName;
 	private String sendMsgTime;
 	
+	
+	
+	public Message() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 	public Message(Integer id, String msg, Integer fromUserId, Integer toUserId, String fromUserName, String toUserName,
 			String sendMsgTime) {
 		super();
@@ -64,5 +70,6 @@ public class Message {
 	public void setToUserName(String toUserName) {
 		this.toUserName = toUserName;
 	}
+	
 	
 }

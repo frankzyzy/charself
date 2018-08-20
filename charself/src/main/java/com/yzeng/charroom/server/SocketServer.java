@@ -1,6 +1,7 @@
 package com.yzeng.charroom.server;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -58,11 +59,14 @@ public class SocketServer {
     */		
 	@OnMessage
 	public void onMessage(String message,Session session) throws IOException {
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		List<Message> msgList = new ArrayList<Message>();
 		JSONObject jsonMsg = JSON.parseObject(message); 
 		String sendMethod = jsonMsg.getString("sendMethod");
 		String sendUserId = jsonMsg.getString("sendUserId");
 		String msg = jsonMsg.getString("msg");
+		Message msgVo = new Message(id+1, msg, user.getId(), 88, user.getUsername(), "tom", formatter.format(new Date()));
+		msgList.add(msgVo);
 		user.setMsg(msgList);
 		if(sendMethod.equals("to")) {
 			sendMessageTo(msg, sendUserId);
@@ -95,8 +99,8 @@ public class SocketServer {
     public void sendMessageTo(String message, String To) throws IOException {  
         for (SocketServer item : clients.values()) { 
             if (item.user.getUsername().equals(To) ) {
+            	System.out.println(JSON.toJSONString(user.getMsg().get(0)));
 				String jsonString = JSON.toJSONString(user.getMsg().get(0));
-				System.out.println(JSON.toJSONString(user.getMsg().get(0)));
 				item.session.getAsyncRemote().sendText(jsonString);  
 			}
         }  
