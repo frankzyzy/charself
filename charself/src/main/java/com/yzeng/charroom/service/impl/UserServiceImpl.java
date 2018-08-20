@@ -1,10 +1,13 @@
 package com.yzeng.charroom.service.impl;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
 import com.yzeng.charroom.dao.UserDao;
 import com.yzeng.charroom.entity.User;
@@ -33,6 +36,10 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void insert(User user) {
+    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    	String md5Pwd = DigestUtils.md5DigestAsHex(user.getPassword().getBytes());
+    	user.setPassword(md5Pwd);
+    	user.setLoginTime(formatter.format(new Date()));
         userDao.insert(user);
     }
 

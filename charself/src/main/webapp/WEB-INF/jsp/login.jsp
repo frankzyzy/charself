@@ -4,10 +4,9 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>${now}</title>
+<title>login</title>
 </head>
 <body>
-	${id} 现在时间是  ${now}
-	${error}
+	<input type>
 </body>
 </html>
