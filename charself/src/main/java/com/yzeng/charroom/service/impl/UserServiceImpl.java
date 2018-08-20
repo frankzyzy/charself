@@ -2,7 +2,9 @@ package com.yzeng.charroom.service.impl;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +28,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User getUser(Integer id) {
-        return userDao.getUser(id);
+        return userDao.getUserById(id);
     }
 
     @Override
@@ -36,8 +38,10 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void insert(User user) {
-    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	String md5Pwd = DigestUtils.md5DigestAsHex(user.getPassword().getBytes());
+    	List<User> findAll = userDao.findAll();
+    	user.setId(findAll.get(findAll.size()-1).getId()+1);
     	user.setPassword(md5Pwd);
     	user.setLoginTime(formatter.format(new Date()));
         userDao.insert(user);
@@ -57,5 +61,21 @@ public class UserServiceImpl implements UserService{
     public List<User> findByPage(User user, Pageable pageable) {
         return userDao.findByPage(user, pageable);
     }
+
+	@Override
+	public Map<String,Object> login(User user) {
+		Map<String,Object> map = new HashMap<String,Object>();
+		String md5Pwd = DigestUtils.md5DigestAsHex(user.getPassword().getBytes());
+		User u = userDao.getUserByName(user.getUsername());
+		if(u != null) {
+			if(u.getPassword().equals(md5Pwd)) {
+				map.put("flag", true);
+				map.put("user", u);
+			}else {
+				map.put("flag", false);
+			}
+		}
+		return map;
+	}
 
 }

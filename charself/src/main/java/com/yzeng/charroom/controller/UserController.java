@@ -1,17 +1,23 @@
 package com.yzeng.charroom.controller;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.servlet.support.RequestContext;
 
 import com.yzeng.charroom.entity.Message;
 import com.yzeng.charroom.entity.User;
@@ -24,6 +30,25 @@ public class UserController {
 	@Autowired
     private UserService userService;
 
+	@RequestMapping("login")
+	public String login(String username,String password,HttpSession session) {
+		User user = new User();
+    	user.setUsername(username);
+    	user.setPassword(password);
+    	Map<String, Object> map = userService.login(user);
+    	if(map != null) {
+    		boolean flag = (boolean) map.get("flag");
+    		if(flag) {
+    			session.setAttribute("user", map.get("user"));
+    			return "index";
+    		}else {
+    			return "login";
+    		}
+    	}else {
+    		return "login";
+    	}
+	}
+	
     @RequestMapping("/get/{id}")
     @ResponseBody
     public User getUser(@PathVariable int id) {
@@ -40,9 +65,9 @@ public class UserController {
 
     @RequestMapping("/add")
     @ResponseBody
-    public String insert(String name,String password) {
+    public String insert(String username,String password) {
     	User user = new User();
-    	user.setUsername(name);
+    	user.setUsername(username);
     	user.setPassword(password);
         userService.insert(user);
         return "sucess";

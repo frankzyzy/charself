@@ -10,7 +10,9 @@ public interface UserDao {
 	
 	List<User> findAll();
 
-	User getUser(Integer id);
+	User getUserById(Integer id);
+	
+	User getUserByName(String username);
 
     void update(User user);
 

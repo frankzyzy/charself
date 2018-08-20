@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    <br/><input id="username" type="text"/>
+    <br/><input id="username" type="text" value="${user.username }"/>
     <br/><input id="text" type="text"/>
     <button onclick="send()">发送消息</button>
     <hr/>

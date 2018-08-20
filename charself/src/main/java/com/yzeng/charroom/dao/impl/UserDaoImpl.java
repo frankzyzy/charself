@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 import com.yzeng.charroom.dao.UserDao;
@@ -33,9 +34,18 @@ public class UserDaoImpl implements UserDao{
      * 根据id得到对象
      */
     @Override
-    public User getUser(Integer id) {
+    public User getUserById(Integer id) {
 
         return mongoTemplate.findOne(new Query(Criteria.where("id").is(id)), User.class);
+    }
+    
+    /**
+     * 根据UserName得到对象
+     */
+    @Override
+    public User getUserByName(String username) {
+    	
+    	return mongoTemplate.findOne(new Query(Criteria.where("username").is(username)), User.class);
     }
 
     /**
@@ -80,9 +90,9 @@ public class UserDaoImpl implements UserDao{
     @Override
     public void update(User user) {
         Criteria criteria = Criteria.where("id").is(user.getId());
-        Query query = new Query(criteria);
-        //Update update = Update.update("name", user.getUsername()).set("age", user.getAge());
-        //mongoTemplate.updateMulti(query, update, User.class);
+        Query query = Query.query(criteria);
+        Update update = Update.update("name", user.getUsername()).set("password", user.getPassword());
+        mongoTemplate.updateMulti(query, update, User.class);
     }
 
     /**

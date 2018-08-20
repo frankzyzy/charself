@@ -60,14 +60,10 @@ public class SocketServer {
 	@OnMessage
 	public void onMessage(String message,Session session) throws IOException {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		List<Message> msgList = new ArrayList<Message>();
 		JSONObject jsonMsg = JSON.parseObject(message); 
 		String sendMethod = jsonMsg.getString("sendMethod");
 		String sendUserId = jsonMsg.getString("sendUserId");
 		String msg = jsonMsg.getString("msg");
-		Message msgVo = new Message(id+1, msg, user.getId(), 88, user.getUsername(), "tom", formatter.format(new Date()));
-		msgList.add(msgVo);
-		user.setMsg(msgList);
 		if(sendMethod.equals("to")) {
 			sendMessageTo(msg, sendUserId);
 		}else if(sendMethod.equals("all")){
