@@ -41,7 +41,11 @@ public class UserServiceImpl implements UserService{
     	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	String md5Pwd = DigestUtils.md5DigestAsHex(user.getPassword().getBytes());
     	List<User> findAll = userDao.findAll();
-    	user.setId(findAll.get(findAll.size()-1).getId()+1);
+    	if(findAll != null && findAll.size() > 0) {
+    		user.setId(findAll.get(findAll.size()-1).getId()+1);
+    	}else {
+    		user.setId(1);
+    	}
     	user.setPassword(md5Pwd);
     	user.setLoginTime(formatter.format(new Date()));
         userDao.insert(user);

@@ -36,7 +36,7 @@ public class UserController {
     	user.setUsername(username);
     	user.setPassword(password);
     	Map<String, Object> map = userService.login(user);
-    	if(map != null) {
+    	if(map != null && map.size() > 0) {
     		boolean flag = (boolean) map.get("flag");
     		if(flag) {
     			session.setAttribute("user", map.get("user"));

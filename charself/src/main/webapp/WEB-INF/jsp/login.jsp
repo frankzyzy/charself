@@ -9,7 +9,14 @@
 <title>login</title>
 </head>
 <body>
+login
 <form action="${ctx}/user/login">
+	<input type="text" name="username">
+	<input type="text" name="password">
+	<button type="submit" >submit</button>
+</form><br/>
+add
+<form action="${ctx}/user/add">
 	<input type="text" name="username">
 	<input type="text" name="password">
 	<button type="submit" >submit</button>
