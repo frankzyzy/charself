@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import com.yzeng.charroom.dao.UserDao;
+import com.yzeng.charroom.dao.UserInfoDao;
 import com.yzeng.charroom.entity.User;
+import com.yzeng.charroom.entity.UserInfo;
 import com.yzeng.charroom.service.UserService;
 
 @Service("userService")
@@ -20,6 +22,9 @@ public class UserServiceImpl implements UserService{
 	
 	@Autowired
     private UserDao userDao;
+	
+	@Autowired
+	private UserInfoDao userInfoDao;
 
     @Override
     public List<User> findAll() {
@@ -49,6 +54,10 @@ public class UserServiceImpl implements UserService{
     	user.setPassword(md5Pwd);
     	user.setLoginTime(formatter.format(new Date()));
         userDao.insert(user);
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserId(user.getId());
+        userInfo.setUsername(user.getUsername());
+        userInfoDao.insert(userInfo);
     }
 
     @Override
@@ -70,14 +79,12 @@ public class UserServiceImpl implements UserService{
 	public Map<String,Object> login(User user) {
 		Map<String,Object> map = new HashMap<String,Object>();
 		String md5Pwd = DigestUtils.md5DigestAsHex(user.getPassword().getBytes());
-		User u = userDao.getUserByName(user.getUsername());
+		User u = userDao.login(user.getUsername(), md5Pwd);
 		if(u != null) {
-			if(u.getPassword().equals(md5Pwd)) {
-				map.put("flag", true);
-				map.put("user", u);
-			}else {
-				map.put("flag", false);
-			}
+			map.put("flag", true);
+			map.put("userInfo", userInfoDao.getUserInfoByUserId(u.getId()));
+		}else {
+			map.put("flag", false);
 		}
 		return map;
 	}

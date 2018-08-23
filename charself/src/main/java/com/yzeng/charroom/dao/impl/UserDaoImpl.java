@@ -47,6 +47,17 @@ public class UserDaoImpl implements UserDao{
     	
     	return mongoTemplate.findOne(new Query(Criteria.where("username").is(username)), User.class);
     }
+    
+    /**
+     	* 登录
+     */
+    @Override
+    public User login(String username,String password) {
+    	Criteria criteria = new Criteria();
+    	criteria.and("username").is(username);
+    	criteria.and("password").is(password);
+    	return mongoTemplate.findOne(new Query(criteria), User.class);
+    }
 
     /**
      * 插入一个用户

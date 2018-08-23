@@ -13,6 +13,8 @@ public interface UserDao {
 	User getUserById(Integer id);
 	
 	User getUserByName(String username);
+	
+	User login(String username,String password);
 
     void update(User user);
 

@@ -39,7 +39,7 @@ public class UserController {
     	if(map != null && map.size() > 0) {
     		boolean flag = (boolean) map.get("flag");
     		if(flag) {
-    			session.setAttribute("user", map.get("user"));
+    			session.setAttribute("user", map.get("userInfo"));
     			return "index";
     		}else {
     			return "login";
