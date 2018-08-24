@@ -1,17 +1,32 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import VueResorce from 'vue-resource'
-import HelloWorld from '@/components/HelloWorld'
+import Index from '@/components/Index'
+import Login from '@/components/Login'
+import Message from '@/components/Message'
 
 Vue.use(Router)
-Vue.use(VueResorce)
 
 export default new Router({
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
-    }
+      name: 'Index',
+      component: Index
+    },
+    {
+	  path: '/login',
+	  name: 'Login',
+	  component: Login
+	},
+    {
+    	path: '/message/:userid',
+    	name: 'Message',
+    	component: Message
+    },
+	{
+		path: '/message',
+		name: 'Message',
+		component: Message
+	}
   ]
 })

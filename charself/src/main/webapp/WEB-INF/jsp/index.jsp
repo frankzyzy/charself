@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    <br/><input id="username" type="text" value="${userInfo.username }"/>
+    <br/><input id="username" type="text" value="${user.username }"/>
     <br/><input id="text" type="text"/>
     <button onclick="send()">发送消息</button>
     <hr/>
@@ -30,7 +30,8 @@ function connect(){
 	}
 	//判断当前浏览器是否支持WebSocket
 	if ('WebSocket' in window) {
-	    websocket = new WebSocket("ws://localhost:8086/socketserver/${userInfo.userId}");
+	    websocket = new WebSocket("ws://localhost:8086/socketserver/${user.userId}");
+	    console.log(websocket);
 	}
 	else {
 	    alert('当前浏览器 Not support websocket')
@@ -78,7 +79,7 @@ function closeWebSocket() {
 function send() {
     var message = document.getElementById('text').value;
     var param = {
-   		from : ${user.id},
+   		from : ${user.userId},
 		to : 2,
 		content : $("#text").val(),
 		type : 0,

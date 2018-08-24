@@ -114,7 +114,7 @@ public class SocketServer {
 	
     public void sendMessage(Message message) throws IOException {
     	Session toSession = userPool.get(message.getToUserId());
-    	if(toSession.isOpen()) {
+    	if(toSession != null && toSession.isOpen()) {
     		toSession.getBasicRemote().sendText(getMessage(message));
     	}else {
     		
