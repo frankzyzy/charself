@@ -52,8 +52,11 @@ public class UserController {
     @RequestMapping("/get/{id}")
     @ResponseBody
     public User getUser(@PathVariable int id) {
-    	User user = userService.getUser(id);
-        return user;
+    	//User user = userService.getUser(id);
+    	User user = new User();
+    	user.setId(1);
+    	User user1 = userService.getNameById(user);
+        return user1;
     }
     
     @RequestMapping("/delete/{id}")

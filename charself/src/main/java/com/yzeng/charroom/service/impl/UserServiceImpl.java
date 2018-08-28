@@ -15,6 +15,7 @@ import com.yzeng.charroom.dao.UserDao;
 import com.yzeng.charroom.dao.UserInfoDao;
 import com.yzeng.charroom.entity.User;
 import com.yzeng.charroom.entity.UserInfo;
+import com.yzeng.charroom.mapper.UserMapper;
 import com.yzeng.charroom.service.UserService;
 
 @Service("userService")
@@ -22,6 +23,9 @@ public class UserServiceImpl implements UserService{
 	
 	@Autowired
     private UserDao userDao;
+	
+	@Autowired
+	private UserMapper userMapper;
 	
 	@Autowired
 	private UserInfoDao userInfoDao;
@@ -45,15 +49,12 @@ public class UserServiceImpl implements UserService{
     public void insert(User user) {
     	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	String md5Pwd = DigestUtils.md5DigestAsHex(user.getPassword().getBytes());
-    	List<User> findAll = userDao.findAll();
-    	if(findAll != null && findAll.size() > 0) {
-    		user.setId(findAll.get(findAll.size()-1).getId()+1);
-    	}else {
-    		user.setId(1);
-    	}
+    	
     	user.setPassword(md5Pwd);
-    	user.setLoginTime(formatter.format(new Date()));
-        userDao.insert(user);
+    	user.setRegistertime(new Date());
+    	user.setLastTime(new Date());
+    	Integer num = userMapper.insertUser(user);
+    	
         UserInfo userInfo = new UserInfo();
         userInfo.setUserId(user.getId());
         userInfo.setUsername(user.getUsername());
@@ -87,6 +88,11 @@ public class UserServiceImpl implements UserService{
 			map.put("flag", false);
 		}
 		return map;
+	}
+
+	@Override
+	public User getNameById(User user) {
+		return userMapper.getNameById(user);
 	}
 
 }

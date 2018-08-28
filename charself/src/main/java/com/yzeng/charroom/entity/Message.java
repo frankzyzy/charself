@@ -1,15 +1,14 @@
 package com.yzeng.charroom.entity;
 
+import java.util.Date;
 
 public class Message {
 	private Integer id;			//ID
 	private String content;		//消息内容
 	private Integer fromUserId; //发送者ID
-	private String fromUserName;//发送者名
 	private Integer toUserId;   //接收者ID
-	private String toUserName;  //接受者名
-	private String sendMsgTime; //发送时间
-	private Integer msgType;    //消息类型
+	private Date sendMsgTime; //发送时间
+	
 	/**
    值为0时：这条消息为普通的文本消息，content为消息内容，服务器转发时会给发出者发一份
         值为-1时：这条消息为普通文本类通知消息，content为消息内容，服务器转发时不会发给发出者
@@ -23,7 +22,9 @@ public class Message {
         值为5时：这条消息为好友申请，content为附加消息(申请结果将以普通消息格式返回)，不给发出者发
         值为6时：这条消息为加群邀请，content为群的id
 	 */
-	private Integer isTransport;//是否离线消息
+	private Integer msgType;    //消息类型
+	private String isOffline;//是否离线消息
+	private Integer isTransport;
 	
 	public String getContent() {
 		return content;
@@ -48,13 +49,12 @@ public class Message {
 	
 	public Message() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 	
-	public String getSendMsgTime() {
+	public Date getSendMsgTime() {
 		return sendMsgTime;
 	}
-	public void setSendMsgTime(String sendMsgTime) {
+	public void setSendMsgTime(Date sendMsgTime) {
 		this.sendMsgTime = sendMsgTime;
 	}
 	
@@ -76,17 +76,11 @@ public class Message {
 	public void setToUserId(Integer toUserId) {
 		this.toUserId = toUserId;
 	}
-	public String getFromUserName() {
-		return fromUserName;
+	public String getIsOffline() {
+		return isOffline;
 	}
-	public void setFromUserName(String fromUserName) {
-		this.fromUserName = fromUserName;
-	}
-	public String getToUserName() {
-		return toUserName;
-	}
-	public void setToUserName(String toUserName) {
-		this.toUserName = toUserName;
+	public void setIsOffline(String isOffline) {
+		this.isOffline = isOffline;
 	}
 	
 	

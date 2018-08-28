@@ -63,6 +63,29 @@ export default {
   			self.userInfo = response.data;
   		})
   	},
+  	//去掉未读提醒
+  	removeMsgRemind () {
+  		self = this;
+  		console.log(self.contentDate)
+  		for(let msg of self.contentDate){
+  				console.log("msg");
+  				console.log(msg.from);
+  				console.log(msg.to);
+  				console.log(self.sendUserId.toString());
+  				console.log(self.dynamicSegment.toString());
+  				console.log(msg.from == self.sendUserId);
+  				console.log(msg.to == self.dynamicSegment);
+  			if(msg.from == self.dynamicSegment && msg.to == self.sendUserId){
+  				msg.notRead = 0;
+  			}
+  		}
+  		self.addComment(self.contentDate);
+  	},
+  	addComment(param) {
+    	//添加完评论后发射监听事件，param是要添加的那条评论消息
+    	this.$emit('add-comment', param);
+    },
+  	
   	//点击发送消息按钮方法
   	sendMsg () {
   		this.message.type = 0;
@@ -98,6 +121,7 @@ export default {
   
   created  : function(){
 	    this.initUserInfo();
+	    this.removeMsgRemind();
   }
 }
 </script>

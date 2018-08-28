@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+ 
+<mapper namespace="com.yzeng.charroom.mapper.UserMapper">
+ 
+ 
+	<select id="getNameById" parameterType="com.yzeng.charroom.entity.User" resultType="com.yzeng.charroom.entity.User">
+		SELECT * FROM t_user WHERE ID = #{id}
+	</select>
+	
+	<insert id="insertUser" parameterType="com.yzeng.charroom.entity.User">
+		insert into t_user(username,password,registertime,lastTime) 
+			values(#{username,jdbcType=VARCHAR},
+				   #{password,jdbcType=VARCHAR},
+				   #{registertime,jdbcType=TIMESTAMP},
+				   #{lastTime,jdbcType=TIMESTAMP}
+				  )
+	</insert>
+	
+</mapper>

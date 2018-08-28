@@ -24,6 +24,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yzeng.charroom.entity.Message;
 import com.yzeng.charroom.entity.User;
+import com.yzeng.charroom.mapper.MessageMapper;
+import com.yzeng.charroom.service.MessageService;
 import com.yzeng.charroom.service.UserService;
 
 @ServerEndpoint(value = "/socketserver/{userId}")
@@ -49,6 +51,7 @@ public class SocketServer {
 	}
 	//你要注入的service或者dao
 	private UserService userService;
+	private MessageService messageService;
 	
 	/**
     * 用户连接时触发
@@ -59,6 +62,7 @@ public class SocketServer {
 	public void open(Session session,@PathParam(value="userId")Integer userId) {
 		this.session = session;
 		userService = applicationContext.getBean(UserService.class);
+		messageService = applicationContext.getBean(MessageService.class);
 		user = userService.getUser(userId);
 		addOnlineCount();
 		clients.put(user, this);
@@ -84,10 +88,10 @@ public class SocketServer {
 		msg.setMsgType(type);
 		msg.setContent(content);
 		msg.setFromUserId(from);
-		msg.setFromUserName(user.getUsername());
 		msg.setToUserId(to);
-		msg.setToUserName(userService.getUser(to).getUsername());
-		msg.setSendMsgTime(formatter.format(new Date()));
+		msg.setSendMsgTime(new Date());
+		msg.setIsOffline("N");
+		messageService.insertMsg(msg);
 		sendMessage(msg);
 		System.out.println("当前发送人sessionid为"+session.getId()+"发送内容为"+message);
 	}
@@ -117,7 +121,7 @@ public class SocketServer {
     	if(toSession != null && toSession.isOpen()) {
     		toSession.getBasicRemote().sendText(getMessage(message));
     	}else {
-    		
+    		return;
     	}
     }
     
@@ -145,15 +149,14 @@ public class SocketServer {
      * 根据Message实体组装Json格式的数据返回给前台
      */
 	public String getMessage(Message message){
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		//使用JSONObject方法构建Json数据
         JSONObject jsonObjectMessage = new JSONObject();
         jsonObjectMessage.put("from", String.valueOf(message.getFromUserId()));
-        jsonObjectMessage.put("fromName", String.valueOf(message.getFromUserName()));
         jsonObjectMessage.put("to", new String[] {String.valueOf(message.getToUserId())});
-        jsonObjectMessage.put("toName", new String[] {String.valueOf(message.getToUserName())});
         jsonObjectMessage.put("content", String.valueOf(message.getContent()));
         jsonObjectMessage.put("type", String.valueOf(message.getMsgType()));
-        jsonObjectMessage.put("time", message.getSendMsgTime());
+        jsonObjectMessage.put("time", formatter.format(message.getSendMsgTime()));
         return jsonObjectMessage.toString();
     }
     

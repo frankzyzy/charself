@@ -67,7 +67,10 @@
 	                            <router-link :to="{path:'/message/',query:{toUserId:item.id,fromUserId:userId}}">
 	                            	<MenuItem :name="'1-'+(index+1)">
 	                            		{{item.username}}
-	                            		{{item.readNum}}
+	                            	<!--遍历消息List，将对应的消息加上未读提醒-->
+	                            	<template v-for="msg in messageConents" v-if="userId == msg.to && msg.from == item.id">
+	                            		{{msg.notRead}}
+	                            	</template>
 	                            	</MenuItem>
 	                            </router-link>
                             </template>
@@ -102,7 +105,7 @@
                     <Content :style="{padding: '0px', minHeight: '1000', background: '#fff'}">
                     <input type="text" v-model="userId">
     <Button @click="initWebpack">showAlert</Button>
-                        <router-view @sendContent="change" v-bind:contentDate="messageConents"/>
+                        <router-view @add-comment="appendComment" @sendContent="change" v-bind:contentDate="messageConents"/>
                     </Content>
                 </Layout>
             </Layout>
@@ -137,6 +140,12 @@ export default {
         }
     },
     methods: {
+    	appendComment (item) {
+    		console.log("item");
+    		console.log(item)
+      		this.messageConents = item;
+      		self.$forceUpdate();	
+    	},
     	sendmsg (msg) {
     		var msgParam = {
 		   		from : msg.from,
@@ -174,24 +183,25 @@ export default {
 		  },
 		  websocketonmessage(e){ //数据接收
 		    var self = this;
+		    console.log(self.userId);
 		    //得到Message的JSon串
 		    var msg = $.parseJSON(e.data);
 		    //循环联系人
 		    $.each(self.contactList,function(index,item){
-		    	if(item.id == msg.from){
-	   				if(item.readNum != null){
-				    	item.readNum++;
-			    	}else{
-				    	item.readNum = 1;
-			    	}
-		    	}
 		    	//循环消息VO中接受者数组
 		    	$.each(msg.to,function(index,v){
-		    		//给对应联系人发送消息（显示小圆点》未读消息数）
+		    		
 				    if(item.id == v){
 				    	//将用户组的对应用户赋值
 				    	msg.to = v;
 				    	msg.toName = msg.toName[index];
+				    	//（显示小圆点》未读消息数）
+				    	if(msg.notRead != null){
+				    		msg.notRead ++;
+				    	}else{
+				    		msg.notRead = 1;
+				    	}
+				    	
 				    	//将一对一消息交给子组件
 				    	self.messageConents.push(msg);
 				    	

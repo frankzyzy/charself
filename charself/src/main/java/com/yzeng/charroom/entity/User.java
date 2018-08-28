@@ -7,21 +7,44 @@ public class User {
 	private Integer id;
 	private String username;
 	private String password;
-	private String loginTime;
+	private Date registertime;
+	private Date lastTime;
+	private String lastIp;
+	public Date getRegistertime() {
+		return registertime;
+	}
+
+
+	public void setRegistertime(Date registertime) {
+		this.registertime = registertime;
+	}
+
+
+	public Date getLastTime() {
+		return lastTime;
+	}
+
+
+	public void setLastTime(Date lastTime) {
+		this.lastTime = lastTime;
+	}
+
+
+	public String getLastIp() {
+		return lastIp;
+	}
+
+
+	public void setLastIp(String lastIp) {
+		this.lastIp = lastIp;
+	}
 	private List<Message> msg;
 	
 	public User() {
 		super();
 	}
 	
-	public User(Integer id, String username, String password, String loginTime, List<Message> msg) {
-		super();
-		this.id = id;
-		this.username = username;
-		this.password = password;
-		this.loginTime = loginTime;
-		this.msg = msg;
-	}
+	
 	public Integer getId() {
 		return id;
 	}
@@ -40,12 +63,7 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	public String getLoginTime() {
-		return loginTime;
-	}
-	public void setLoginTime(String loginTime) {
-		this.loginTime = loginTime;
-	}
+	
 	public List<Message> getMsg() {
 		return msg;
 	}

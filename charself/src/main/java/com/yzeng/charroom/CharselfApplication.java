@@ -7,6 +7,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import com.yzeng.charroom.server.SocketServer;
 
 @SpringBootApplication
+//@MapperScan("com.yzeng.charroom.mapper.UserMapper")
 public class CharselfApplication {
 
 	public static void main(String[] args) {
