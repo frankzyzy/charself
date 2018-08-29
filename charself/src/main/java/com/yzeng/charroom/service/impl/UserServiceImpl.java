@@ -15,6 +15,7 @@ import com.yzeng.charroom.dao.UserDao;
 import com.yzeng.charroom.dao.UserInfoDao;
 import com.yzeng.charroom.entity.User;
 import com.yzeng.charroom.entity.UserInfo;
+import com.yzeng.charroom.mapper.UserInfoMapper;
 import com.yzeng.charroom.mapper.UserMapper;
 import com.yzeng.charroom.service.UserService;
 
@@ -28,11 +29,15 @@ public class UserServiceImpl implements UserService{
 	private UserMapper userMapper;
 	
 	@Autowired
+	private UserInfoMapper userInfoMapper;
+	
+	@Autowired
 	private UserInfoDao userInfoDao;
 
     @Override
-    public List<User> findAll() {
-        return userDao.findAll();
+    public List<UserInfo> findAll() {
+        //return userDao.findAll();
+        return userInfoMapper.findAll();
     }
 
     @Override
@@ -47,18 +52,18 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public void insert(User user) {
-    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	String md5Pwd = DigestUtils.md5DigestAsHex(user.getPassword().getBytes());
-    	
+    	//插入用户账户信息
     	user.setPassword(md5Pwd);
     	user.setRegistertime(new Date());
     	user.setLastTime(new Date());
     	Integer num = userMapper.insertUser(user);
     	
+    	//插入用户个人信息
         UserInfo userInfo = new UserInfo();
         userInfo.setUserId(user.getId());
         userInfo.setUsername(user.getUsername());
-        userInfoDao.insert(userInfo);
+        userInfoMapper.firstSaveUserInfo(userInfo);
     }
 
     @Override
@@ -83,7 +88,7 @@ public class UserServiceImpl implements UserService{
 		User u = userDao.login(user.getUsername(), md5Pwd);
 		if(u != null) {
 			map.put("flag", true);
-			map.put("userInfo", userInfoDao.getUserInfoByUserId(u.getId()));
+			map.put("userInfo", userInfoMapper.getUserInfoByUserId(u.getId()));
 		}else {
 			map.put("flag", false);
 		}
@@ -93,6 +98,24 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public User getNameById(User user) {
 		return userMapper.getNameById(user);
+	}
+	
+	
+	/**************以下为个人信息相关操作*****************/ 	
+	@Override
+	public int firstSaveUserInfo(UserInfo userInfo) {
+		
+		return userInfoMapper.firstSaveUserInfo(userInfo);
+	}
+
+	@Override
+	public UserInfo getUserInfoByUserId(Integer userId) {
+		return userInfoMapper.getUserInfoByUserId(userId);
+	}
+
+	@Override
+	public int updateUserInfo(UserInfo userInfo) {
+		return userInfoMapper.updateUserInfo(userInfo);
 	}
 
 }

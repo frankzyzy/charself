@@ -24,6 +24,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yzeng.charroom.entity.Message;
 import com.yzeng.charroom.entity.User;
+import com.yzeng.charroom.entity.UserInfo;
 import com.yzeng.charroom.mapper.MessageMapper;
 import com.yzeng.charroom.service.MessageService;
 import com.yzeng.charroom.service.UserService;
@@ -38,11 +39,11 @@ public class SocketServer {
 	
 	private static Integer id = 0; 
 	//客户端对象列表
-	private static Map<User, SocketServer> clients = new ConcurrentHashMap<User,SocketServer>();
+	private static Map<UserInfo, SocketServer> clients = new ConcurrentHashMap<UserInfo,SocketServer>();
 	//用户与websocket绑定session
 	private static Map<Integer,Session> userPool = new HashMap<Integer,Session>();
 	//当前用户
-	private User user;
+	private UserInfo user;
 	
 	//此处是解决无法注入的关键(同时配置启动类)
 	private static ApplicationContext applicationContext;
@@ -63,10 +64,31 @@ public class SocketServer {
 		this.session = session;
 		userService = applicationContext.getBean(UserService.class);
 		messageService = applicationContext.getBean(MessageService.class);
-		user = userService.getUser(userId);
+		
+		//获得登录用户个人信息
+		user = userService.getUserInfoByUserId(userId);
+		//更新在线状态
+		user.setIsOnline(1);
+		userService.updateUserInfo(user);
+		//增加在线人数
 		addOnlineCount();
+		//放入客户端Map
 		clients.put(user, this);
+		//放入用户池
 		userPool.put(userId, session);
+		//检查自己是否有未接收的消息
+		List<Message> messageList = new ArrayList<Message>();
+		messageList = messageService.getOfflineMessageList(userId);
+		if(messageList != null && messageList.size() > 0) {
+			for (Message message : messageList) {
+				String jsonMessage = getMessage(message);
+				//发送特定消息
+				singleSend(jsonMessage, userPool.get(userId));
+				message.setIsOffline("N");
+				messageService.updateMessage(message);
+			}
+		}
+				
 		System.out.println(userId+"已连接");
 	}
 	
@@ -90,8 +112,7 @@ public class SocketServer {
 		msg.setFromUserId(from);
 		msg.setToUserId(to);
 		msg.setSendMsgTime(new Date());
-		msg.setIsOffline("N");
-		messageService.insertMsg(msg);
+		
 		sendMessage(msg);
 		System.out.println("当前发送人sessionid为"+session.getId()+"发送内容为"+message);
 	}
@@ -101,9 +122,16 @@ public class SocketServer {
     */
 	@OnClose
 	public void onClose() {
+		//客户端移除
 		clients.remove(user);  
-		userPool.remove(user.getId());
+		//用户池移除
+		userPool.remove(user.getUserId());
+		//在线人数减一
         subOnlineCount();  
+        //将用户的在线状态设为0
+        user.setIsOnline(0);
+        //更新用户个人信息状态
+		userService.updateUserInfo(user);
 	}
 	
 	/**
@@ -115,13 +143,24 @@ public class SocketServer {
     public void onError(Session session, Throwable error) {
         error.printStackTrace();
     }
-	
+    
+	/**
+	 * 发送消息
+	 * @param message
+	 * @throws IOException
+	 */
     public void sendMessage(Message message) throws IOException {
     	Session toSession = userPool.get(message.getToUserId());
+    	//判断是否在线
     	if(toSession != null && toSession.isOpen()) {
+    		message.setIsOffline("N");
+    		messageService.insertMsg(message);
+    		
     		toSession.getBasicRemote().sendText(getMessage(message));
     	}else {
-    		return;
+    		//将消息写到DB,标记为离线消息
+    		message.setIsOffline("Y");
+    		messageService.insertMsg(message);
     	}
     }
     
@@ -143,6 +182,20 @@ public class SocketServer {
             item.session.getAsyncRemote().sendText(message);  
         }  
     }  
+    
+    /**
+     * 对特定用户发送消息
+     * @param message
+     * @param session
+     */
+    public void singleSend(String message, Session session){
+        try {
+            session.getBasicRemote().sendText(message);
+            System.out.println("特定消息:"+message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 	
 	
     /**

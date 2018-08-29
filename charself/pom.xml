@@ -76,6 +76,13 @@
 			<artifactId>spring-data-commons</artifactId>
 		</dependency>
 		
+		<!--分页插件 -->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>1.1.2</version>
+        </dependency>
+		
 		<!--druid连接池 -->
 		<dependency>
 		    <groupId>com.alibaba</groupId>
@@ -92,9 +99,15 @@
  
         <!-- MySql驱动 -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            </dependency>
+        	<groupId>mysql</groupId>
+        	<artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <!-- 日志 -->
+        <dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
 		
 		
 	</dependencies>

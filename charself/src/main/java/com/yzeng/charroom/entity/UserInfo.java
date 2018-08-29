@@ -1,5 +1,7 @@
 package com.yzeng.charroom.entity;
 
+import java.util.Date;
+
 /**
  * 用户信息资料
  * @author yzengchn@163.com
@@ -13,15 +15,19 @@ public class UserInfo {
 	private String username;
 	//昵称
 	private String nickname;
-	//性别
+	//性别（1男 2女 0未填）
 	private Integer sex;
 	//年龄
 	private Integer age; 
 	//出生年月日
+	private Date birthTime;
 	//签名
 	private String signature; 
 	//头像
 	private Integer avatarId;
+	//1为在线  0为离线
+	private Integer isOnline;
+	
 	public Integer getUserId() {
 		return userId;
 	}
@@ -63,6 +69,18 @@ public class UserInfo {
 	}
 	public void setAvatarId(Integer avatarId) {
 		this.avatarId = avatarId;
+	}
+	public Integer getIsOnline() {
+		return isOnline;
+	}
+	public void setIsOnline(Integer isOnline) {
+		this.isOnline = isOnline;
+	}
+	public Date getBirthTime() {
+		return birthTime;
+	}
+	public void setBirthTime(Date birthTime) {
+		this.birthTime = birthTime;
 	}
 	
 	

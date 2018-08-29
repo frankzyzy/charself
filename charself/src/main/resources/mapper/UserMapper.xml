@@ -8,7 +8,7 @@
 		SELECT * FROM t_user WHERE ID = #{id}
 	</select>
 	
-	<insert id="insertUser" parameterType="com.yzeng.charroom.entity.User">
+	<insert id="insertUser" parameterType="com.yzeng.charroom.entity.User" useGeneratedKeys="true" keyProperty="id">
 		insert into t_user(username,password,registertime,lastTime) 
 			values(#{username,jdbcType=VARCHAR},
 				   #{password,jdbcType=VARCHAR},

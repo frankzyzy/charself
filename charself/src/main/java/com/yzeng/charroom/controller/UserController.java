@@ -21,6 +21,7 @@ import org.springframework.web.servlet.support.RequestContext;
 
 import com.yzeng.charroom.entity.Message;
 import com.yzeng.charroom.entity.User;
+import com.yzeng.charroom.entity.UserInfo;
 import com.yzeng.charroom.service.UserService;
 
 @Controller
@@ -54,7 +55,7 @@ public class UserController {
     public User getUser(@PathVariable int id) {
     	//User user = userService.getUser(id);
     	User user = new User();
-    	user.setId(1);
+    	user.setId(id);
     	User user1 = userService.getNameById(user);
         return user1;
     }
@@ -89,7 +90,7 @@ public class UserController {
 
     @RequestMapping("/find/all")
     @ResponseBody
-    public List<User> find(){
+    public List<UserInfo> find(){
         return userService.findAll();
     }
 

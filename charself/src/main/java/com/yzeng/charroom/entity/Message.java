@@ -24,7 +24,7 @@ public class Message {
 	 */
 	private Integer msgType;    //消息类型
 	private String isOffline;//是否离线消息
-	private Integer isTransport;
+	private Integer isTransport; //传输状态1：已读 0：未读 2：失败
 	
 	public String getContent() {
 		return content;

@@ -19,4 +19,34 @@
 				  )
 	</insert>
 	
+	<select id="getMessageloggingList" parameterType="Message" resultType="Message">
+		SELECT * FROM t_message t 
+			WHERE t.fromUserId in(#{fromUserId},#{toUserId})  
+				  AND t.toUserId in (#{fromUserId},#{toUserId}) 
+				  AND t.msgType = #{msgType} 
+				  ORDER BY t.sendMsgTime DESC
+	</select>
+	<!-- 查询离线消息 -->
+	<select id="getOfflineMessageList" parameterType="java.lang.Integer" resultType="Message">
+		select * from t_message t where t.toUserId = #{userId} and t.isOffline = 'Y'
+	</select>
+	
+	<!-- 查询消息传输状态1：已读 0：未读 2：失败-->
+	<select id="getMessageListByStatus" parameterType="Message" resultType="Message">
+		select * from t_message t where t.toUserId = #{toUserId} and t.isTransport = #{isTransport}
+	</select>
+	
+	<update id="updateMessage" parameterType="Message">
+		update t_message t
+		<set>
+			<if test="isOffline != null and isOffline != ''">
+				t.isOffline = #{isOffline},
+			</if>
+			<if test="isTransport != null and isTransport != '' or isTransport == 0">
+				t.isTransport = #{isTransport},
+			</if>
+		</set>
+		where t.id = #{id}
+	</update>
+	
 </mapper>

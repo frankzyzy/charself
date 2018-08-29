@@ -64,13 +64,9 @@
                                  	我的好友 ({{contactList.length}})
                             </template>
                             <template v-for="(item,index) in contactList">
-	                            <router-link :to="{path:'/message/',query:{toUserId:item.id,fromUserId:userId}}">
+	                            <router-link :to="{path:'/message/',query:{toUserId:item.userId,fromUserId:userId}}">
 	                            	<MenuItem :name="'1-'+(index+1)">
-	                            		{{item.username}}
-	                            	<!--遍历消息List，将对应的消息加上未读提醒-->
-	                            	<template v-for="msg in messageConents" v-if="userId == msg.to && msg.from == item.id">
-	                            		{{msg.notRead}}
-	                            	</template>
+	                            		{{item.username}}{{item.notRead}}
 	                            	</MenuItem>
 	                            </router-link>
                             </template>
@@ -105,7 +101,7 @@
                     <Content :style="{padding: '0px', minHeight: '1000', background: '#fff'}">
                     <input type="text" v-model="userId">
     <Button @click="initWebpack">showAlert</Button>
-                        <router-view @add-comment="appendComment" @sendContent="change" v-bind:contentDate="messageConents"/>
+                        <router-view @add-comment="appendComment" @sendContent="change" v-bind:contentDate="offlineMsgList"/>
                     </Content>
                 </Layout>
             </Layout>
@@ -122,7 +118,8 @@ export default {
             isCollapsed: false,
             contactList: [],
             msgCont : null,
-            messageConents : []
+            messageConents : [],
+            offlineMsgList : []
         }
     },
     computed: {
@@ -140,6 +137,19 @@ export default {
         }
     },
     methods: {
+    	getOfflineMessageList(userId){
+    		var self = this;
+    		$.ajax({
+    			url:'/msg/getOfflineMessageList?userId='+userId,
+    			type:'GET',
+    			async:false, 
+    			dataType : 'json',
+    			success:function(data){
+    				console.log(data);
+	    			self.offlineMsgList = data;
+    			}
+    		});
+    	},
     	appendComment (item) {
     		console.log("item");
     		console.log(item)
@@ -186,30 +196,30 @@ export default {
 		    console.log(self.userId);
 		    //得到Message的JSon串
 		    var msg = $.parseJSON(e.data);
+		    self.getOfflineMessageList(self.userId);
+		    
+		    console.log(self.contactList);
+		    console.log("self.offlineMsgList");
+		    console.log(self.offlineMsgList);
+		    console.log(msg);
 		    //循环联系人
-		    $.each(self.contactList,function(index,item){
-		    	//循环消息VO中接受者数组
-		    	$.each(msg.to,function(index,v){
-		    		
-				    if(item.id == v){
-				    	//将用户组的对应用户赋值
-				    	msg.to = v;
-				    	msg.toName = msg.toName[index];
-				    	//（显示小圆点》未读消息数）
-				    	if(msg.notRead != null){
-				    		msg.notRead ++;
-				    	}else{
-				    		msg.notRead = 1;
-				    	}
-				    	
-				    	//将一对一消息交给子组件
-				    	self.messageConents.push(msg);
-				    	
-				    	console.log("self.messageConents");
-				    	console.log(self.messageConents);
-				    }
-				    
+		    $.each(self.contactList,function(indexs,item){
+		    	$.each(self.offlineMsgList,function(index,msgItem){
+		    		if(msgItem.fromUserId == item.userId){
+		    			if(item.notRead != null){
+		    			
+		    				if(self.offlineMsgList.length == 1){
+			    				item.notRead = 1;
+		    				}
+		    				if(self.offlineMsgList.length > item.notRead){
+			    				item.notRead ++;
+		    				}
+		    			}else{
+		    				item.notRead = 1;
+		    			}
+		    		}
 		    	});
+		    	
 		    });
 		    console.log(self.contactList);
 			self.$forceUpdate();		    

@@ -69,16 +69,14 @@ export default {
   		console.log(self.contentDate)
   		for(let msg of self.contentDate){
   				console.log("msg");
-  				console.log(msg.from);
-  				console.log(msg.to);
-  				console.log(self.sendUserId.toString());
-  				console.log(self.dynamicSegment.toString());
-  				console.log(msg.from == self.sendUserId);
-  				console.log(msg.to == self.dynamicSegment);
-  			if(msg.from == self.dynamicSegment && msg.to == self.sendUserId){
+  				console.log(msg);
+  			axios.get('')
+  			if(msg.fromUserId == self.sendUserIddynamicSegment && msg.toUserId == self.dynamicSegment){
   				msg.notRead = 0;
   			}
   		}
+  		console.log("self.contentDate")
+  		console.log(self.contentDate)
   		self.addComment(self.contentDate);
   	},
   	addComment(param) {
