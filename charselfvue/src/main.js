@@ -2,12 +2,20 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
+import FriendsList from './components/FriendsList'
+import GroupList from './components/GroupList'
+import Message from './components/Message'
 import router from './router'
 
 import iView from 'iview'
 import 'iview/dist/styles/iview.css'    // 使用 CSS
+
 Vue.use(iView)
 
+//全局注册组件
+Vue.component("FriendsList",FriendsList)
+Vue.component("GroupList",GroupList)
+Vue.component("Message",Message)
 
 Vue.config.productionTip = false
 

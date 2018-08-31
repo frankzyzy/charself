@@ -19,12 +19,16 @@
 				  )
 	</insert>
 	
+	<select id="getMessageTotalCount" resultType="Integer">
+		SELECT count(id) FROM t_message
+	</select>
+	
 	<select id="getMessageloggingList" parameterType="Message" resultType="Message">
 		SELECT * FROM t_message t 
 			WHERE t.fromUserId in(#{fromUserId},#{toUserId})  
 				  AND t.toUserId in (#{fromUserId},#{toUserId}) 
 				  AND t.msgType = #{msgType} 
-				  ORDER BY t.sendMsgTime DESC
+				  
 	</select>
 	<!-- 查询离线消息 -->
 	<select id="getOfflineMessageList" parameterType="java.lang.Integer" resultType="Message">
@@ -46,7 +50,16 @@
 				t.isTransport = #{isTransport},
 			</if>
 		</set>
-		where t.id = #{id}
+		where 1 = 1
+			<if test="fromUserId == null or fromUserId == '' or toUserId == null or toUserId == ''">
+			  and t.id = #{id}
+			</if>
+			<if test="fromUserId != null and fromUserId != ''">
+				and t.fromUserId = #{fromUserId}
+			</if>
+			<if test="toUserId != null and toUserId != ''">
+				and t.toUserId = #{toUserId}
+			</if>
 	</update>
 	
 </mapper>

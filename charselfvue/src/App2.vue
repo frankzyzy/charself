@@ -26,7 +26,34 @@
     <div class="layout">
         <Layout>
             <Header>
-                
+                <Menu mode="horizontal" theme="dark" active-name="1">
+                    <div class="layout-logo"></div>
+                    <div class="layout-nav">
+                        <MenuItem name="1">
+					            <Icon type="ios-paper" />
+					            内容管理
+					        </MenuItem>
+					        <MenuItem name="2">
+					            <Icon type="ios-people" />
+					            用户管理
+					        </MenuItem>
+					        <Submenu name="3">
+					            <template slot="title">
+					                <Icon type="ios-stats" />
+					                统计分析
+					            </template>
+					            <MenuGroup title="使用">
+					                <MenuItem name="3-1">新增和启动</MenuItem>
+					                <MenuItem name="3-2">活跃分析</MenuItem>
+					                <MenuItem name="3-3">时段分析</MenuItem>
+					            </MenuGroup>
+					            <MenuGroup title="留存">
+					                <MenuItem name="3-4">用户留存</MenuItem>
+					                <MenuItem name="3-5">流失用户</MenuItem>
+					            </MenuGroup>
+					        </Submenu>
+                    </div>
+                </Menu>
             </Header>
             <Layout>
                 <Sider ref="side1" hide-trigger collapsible :style="{background: '#fff'}" v-model="isCollapsed">
@@ -74,11 +101,8 @@
                     <Content :style="{padding: '0px', minHeight: '1000', background: '#fff'}">
                     <input type="text" v-model="userId">
     <Button @click="initWebpack">showAlert</Button>
-                        <router-view 
-                        	@sendContent="change" 
-                        	v-bind:contentDate="offlineMsgList"
-                        	v-bind:messageConent="messageConent"
-                        />
+                        <router-view @add-comment="appendComment" @sendContent="change" v-bind:contentDate="offlineMsgList"/>
+                        <Message></Message>
                     </Content>
                 </Layout>
             </Layout>
@@ -93,9 +117,9 @@ export default {
         	websock : [],
             userId : null,
             isCollapsed: false,
-            contactList: {},
-            msgCont : [],
-            messageConent : [],
+            contactList: [],
+            msgCont : null,
+            messageConents : [],
             offlineMsgList : []
         }
     },
@@ -122,11 +146,17 @@ export default {
     			async:false, 
     			dataType : 'json',
     			success:function(data){
+    				console.log(data);
 	    			self.offlineMsgList = data;
     			}
     		});
     	},
-    	
+    	appendComment (item) {
+    		console.log("item");
+    		console.log(item)
+      		this.messageConents = item;
+      		self.$forceUpdate();	
+    	},
     	sendmsg (msg) {
     		var msgParam = {
 		   		from : msg.from,
@@ -164,18 +194,17 @@ export default {
 		  },
 		  websocketonmessage(e){ //数据接收
 		    var self = this;
+		    console.log(self.userId);
 		    //得到Message的JSon串
 		    var msg = $.parseJSON(e.data);
 		    self.getOfflineMessageList(self.userId);
 		    
+		    console.log(self.contactList);
 		    console.log("self.offlineMsgList");
 		    console.log(self.offlineMsgList);
 		    console.log(msg);
 		    //循环联系人
 		    $.each(self.contactList,function(indexs,item){
-		    	if(msg.from == item.userId){
-		    		self.messageConent = msg;
-		    	}
 		    	$.each(self.offlineMsgList,function(index,msgItem){
 		    		if(msgItem.fromUserId == item.userId){
 		    			if(item.notRead != null){
@@ -193,7 +222,6 @@ export default {
 		    	});
 		    	
 		    });
-		    console.log(self.messageConent);
 		    console.log(self.contactList);
 			self.$forceUpdate();		    
 		  },

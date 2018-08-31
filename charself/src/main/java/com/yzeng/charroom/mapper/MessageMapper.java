@@ -16,6 +16,12 @@ public interface MessageMapper {
 	Integer insertMsg (Message message);
 	
 	/**
+	 * 获得消息总数
+	 * @return
+	 */
+	Integer getMessageTotalCount();
+	
+	/**
 	 * 根据ID查询消息
 	 * @param id
 	 * @return

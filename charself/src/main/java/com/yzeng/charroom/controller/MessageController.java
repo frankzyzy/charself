@@ -37,11 +37,24 @@ public class MessageController {
 		return messageService.getMessageListByStatus(message);
 	}
 	
-	@RequestMapping("updateOffline")
-	public String updateOffline(int[] messageIds) {
+	@RequestMapping("updateMsgStatus")
+	@ResponseBody
+	public String updateMsgStatus(Integer fromUserId, Integer toUserId) {
 		Message message = new Message();
+		message.setFromUserId(fromUserId);
+		message.setToUserId(toUserId);
 		message.setIsTransport(1);
 		messageService.updateMessage(message);
 		return "";
+	}
+	
+	@RequestMapping("getMsgHistory")
+	@ResponseBody
+	public List<Message> getMsgHistory(Integer fromUserId, Integer toUserId){
+		Message message = new Message();
+		message.setFromUserId(fromUserId);
+		message.setToUserId(toUserId);
+		message.setMsgType(1);
+		return messageService.getMessageloggingList(message, 10, 10);
 	}
 }

@@ -47,10 +47,4 @@ public interface MessageService {
 	 * @return
 	 */
 	int updateMessage (Message message);
-	
-	/**
-	 * 更新消息的
-	 * @return
-	 */
-	String updateOffline();
 }
