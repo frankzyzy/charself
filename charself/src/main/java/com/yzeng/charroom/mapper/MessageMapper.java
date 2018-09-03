@@ -16,10 +16,10 @@ public interface MessageMapper {
 	Integer insertMsg (Message message);
 	
 	/**
-	 * 获得消息总数
+	 * 获得聊天记录总数
 	 * @return
 	 */
-	Integer getMessageTotalCount();
+	Integer getMessageTotalCount(Message message);
 	
 	/**
 	 * 根据ID查询消息

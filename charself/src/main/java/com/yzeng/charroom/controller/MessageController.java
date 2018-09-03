@@ -50,11 +50,21 @@ public class MessageController {
 	
 	@RequestMapping("getMsgHistory")
 	@ResponseBody
-	public List<Message> getMsgHistory(Integer fromUserId, Integer toUserId){
+	public List<Message> getMsgHistory(Integer fromUserId, Integer toUserId,Integer pageNum, Integer pageSize){
+		//总页数
+		Integer pageCount = 0;
 		Message message = new Message();
 		message.setFromUserId(fromUserId);
 		message.setToUserId(toUserId);
 		message.setMsgType(1);
-		return messageService.getMessageloggingList(message, 10, 10);
+		Integer totalCount = messageService.getMessageTotalCount(message);
+		if(totalCount%pageSize == 0) {
+			pageCount = totalCount/pageSize;
+		}else {
+			pageCount = (totalCount/pageSize) + 1;
+		}
+		//当前传入的页数，计算
+		pageNum = pageCount - pageNum;
+		return messageService.getMessageloggingList(message, pageNum, pageSize);
 	}
 }

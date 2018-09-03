@@ -21,6 +21,12 @@ public interface MessageService {
 	Message getMsgById(Integer id);
 	
 	/**
+	 * 获得聊天记录总数
+	 * @return
+	 */
+	Integer getMessageTotalCount(Message message);
+	
+	/**
 	 * 聊天记录查询
 	 * @param message
 	 * @return

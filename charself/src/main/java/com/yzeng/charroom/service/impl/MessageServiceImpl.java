@@ -47,4 +47,9 @@ public class MessageServiceImpl implements MessageService{
 		return messageMapper.getMessageListByStatus(message);
 	}
 
+	@Override
+	public Integer getMessageTotalCount(Message message) {
+		return messageMapper.getMessageTotalCount(message);
+	}
+
 }

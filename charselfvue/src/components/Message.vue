@@ -49,8 +49,10 @@ export default {
   name: 'Login',
   data () {
     return {
-      ChatHistory:{},
+      ChatHistory:{},//聊天历史最后一页
+      ChatHistoryMore:{},//聊天记录更多
       messageConents:[],
+      pageNum : 0,
       userInfo : {},
       msgContent: '',
       message : [],
@@ -59,12 +61,13 @@ export default {
   props : ['contentDate','messageConent'],
   methods : {
   	handleReachTop () {
+	  		console.log("this.pageNum")
+  		
         return new Promise(resolve => {
             setTimeout(() => {
-                const first = this.ChatHistory[0];
-                for (let i = 1; i < 11; i++) {
-                    this.ChatHistory.unshift(first - i);
-                }
+	  		this.pageNum++;
+	  		this.initChatHistory();
+                
                 resolve();
             }, 2000);
         });
@@ -102,24 +105,43 @@ export default {
   	
   	//点击发送消息按钮方法
   	sendMsg () {
+  		var firstArray = [1,2,3];
+		var secondArray = [4,5,6];
+		Array.prototype.push.apply(secondArray, firstArray);
+		console.log(secondArray);
+  		
   		this.message.type = 1;
   		this.message.from = this.$route.query.fromUserId;
   		this.message.to = this.dynamicSegment;
   		this.message.content = this.msgContent;
+  		this.messageConents.push({'content':this.msgContent,'from':this.message.from,'time':this.getDateFull(),'to':[this.message.to],'type':1});
   		this.$emit('sendContent',this.message);
+  		self.$forceUpdate();
   	},
   	//初始化聊天记录
   	initChatHistory () {
   		var self = this;
   		axios.post('/msg/getMsgHistory',qs.stringify({
   			fromUserId : self.sendUserId,
-  			toUserId : self.dynamicSegment
+  			toUserId : self.dynamicSegment,
+  			pageSize : 10,
+  			pageNum : self.pageNum
   		}))
   		.then(function(response){
-  			self.ChatHistory = response.data;
-  			$.each(self.ChatHistory,function(){
-  				this.sendMsgTime = hssduc.util.DateUtils.formatTimeStamp(this.sendMsgTime,"yyyy-MM-dd HH:mm:ss")
-  			})
+  			if(self.pageNum == 0){
+  				self.ChatHistory = response.data;
+	  			$.each(self.ChatHistory,function(){
+	  				this.sendMsgTime = hssduc.util.DateUtils.formatTimeStamp(this.sendMsgTime,"yyyy-MM-dd HH:mm:ss")
+	  			})
+  			}else{
+	  			self.ChatHistory = self.ChatHistoryMore;
+	  			self.ChatHistoryMore = response.data;
+	  			Array.prototype.push.apply(self.ChatHistoryMore, self.ChatHistory);
+	  			self.ChatHistory = self.ChatHistoryMore;
+	  			$.each(self.ChatHistory,function(){
+	  				this.sendMsgTime = hssduc.util.DateUtils.formatTimeStamp(this.sendMsgTime,"yyyy-MM-dd HH:mm:ss")
+	  			})
+  			}
   		})
   	},
   	addMsgContext (val){
@@ -135,6 +157,21 @@ export default {
      	})
       
   	},
+  	//获得当前时间
+  	getDateFull() {
+		var date = new Date();
+		var currentdate = date.getFullYear() + "-"
+				+ this.appendZero(date.getMonth() + 1) + "-"
+				+ this.appendZero(date.getDate()) + " "
+				+ this.appendZero(date.getHours()) + ":"
+				+ this.appendZero(date.getMinutes()) + ":"
+				+ this.appendZero(date.getSeconds());
+		return currentdate;
+	},
+	//补0函数
+	appendZero(s) {
+		return ("00" + s).substr((s + "").length);
+	} 
   	
   },
   
@@ -149,6 +186,8 @@ export default {
   
   watch : {
   		dynamicSegment (){
+  		   this.pageNum = 0;//切换聊天对象时清空记录页数
+  		   this.ChatHistoryMore = {};//切换聊天对象时清空记录
 	       this.initUserInfo();
 	       this.initChatHistory();
   		},

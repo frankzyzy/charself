@@ -19,8 +19,11 @@
 				  )
 	</insert>
 	
-	<select id="getMessageTotalCount" resultType="Integer">
-		SELECT count(id) FROM t_message
+	<select id="getMessageTotalCount" parameterType="Message" resultType="Integer">
+		SELECT count(id) FROM t_message t 
+			WHERE t.fromUserId in(#{fromUserId},#{toUserId})  
+				  AND t.toUserId in (#{fromUserId},#{toUserId}) 
+				  AND t.msgType = #{msgType} 
 	</select>
 	
 	<select id="getMessageloggingList" parameterType="Message" resultType="Message">
