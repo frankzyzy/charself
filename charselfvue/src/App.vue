@@ -1,4 +1,4 @@
-<style scoped>
+<style>
 .layout{
     border: 1px solid #d7dde4;
     background: #f5f7f9;
@@ -21,59 +21,51 @@
     margin: 0 auto;
     margin-right: 20px;
 }
+.ivu-tabs-bar{
+	margin-bottom: 0px;
+}
 </style>
 <template>
     <div class="layout">
+    <input type="text" v-model="userId">
+    				<Button @click="initWebpack">showAlert</Button>
         <Layout>
             <Header>
-                
+                <AddFriend 
+                	ref="addFriend"
+                	v-bind:loginUserId="userId"
+                	v-bind:showAddFriend="showAddFriend"
+                	@sendmsg="sendmsg" />
             </Header>
             <Layout>
                 <Sider ref="side1" hide-trigger collapsible :style="{background: '#fff'}" v-model="isCollapsed">
-                    <Menu active-name="1-2" theme="light" width="auto" :open-names="['1']" :class="menuitemClasses">
-                        <Submenu name="1">
-                            <template slot="title">
-                                <Icon type="ios-navigate"></Icon>
-                                 	我的好友 ({{contactList.length}})
-                            </template>
-                            <template v-for="(item,index) in contactList">
-	                            <router-link :to="{path:'/message/',query:{toUserId:item.userId,fromUserId:userId}}">
-	                            	<MenuItem :name="'1-'+(index+1)">
-	                            		{{item.username}}{{item.notRead}}
-	                            	</MenuItem>
-	                            </router-link>
-                            </template>
-                            <MenuItem name="1-5">Option 2</MenuItem>
-                            <MenuItem name="1-6">Option 3</MenuItem>
-                        </Submenu>
-                        <Submenu name="2">
-                            <template slot="title">
-                                <Icon type="ios-keypad"></Icon>
-                                Item 2
-                            </template>
-                            <MenuItem name="2-1">Option 1</MenuItem>
-                            <MenuItem name="2-2">Option 2</MenuItem>
-                        </Submenu>
-                        <Submenu name="3">
-                            <template slot="title">
-                                <Icon type="ios-analytics"></Icon>
-                                Item 3
-                            </template>
-                            <MenuItem name="3-1">Option 1</MenuItem>
-                            <MenuItem name="3-2">Option 2</MenuItem>
-                        </Submenu>
-                    </Menu>
+                	<Tabs type="card" style="padding-left:7px">
+				        <TabPane label="好友" icon="ios-contact">
+				        	<FriendsList
+		                    	v-bind:loginUserId="userId" 
+		                    	v-bind:friendsList="contactList"
+		                    />
+		                </TabPane>
+				        <TabPane label="群组" icon="md-contacts">
+				       		 <GroupList 
+				       		 	v-bind:loginUserId="userId"
+				       		 />
+				        </TabPane>
+				    </Tabs>
+	                	
+                    
+                    <Button @click="showAddFriend = true">添加好友</Button>
                     <Icon @click.native="collapsedSider" :class="rotateIcon" style="float:right;padding-right:8px" type="md-menu" size="24"></Icon>
                 </Sider>
                 <Layout :style="{padding: '0 0px 0px'}">
+                
                     <!--<Breadcrumb :style="{margin: '24px 0'}">
                         <BreadcrumbItem>Home</BreadcrumbItem>
                         <BreadcrumbItem>Components</BreadcrumbItem>
                         <BreadcrumbItem>Layout</BreadcrumbItem>
                     </Breadcrumb>-->
                     <Content :style="{padding: '0px', minHeight: '1000', background: '#fff'}">
-                    <input type="text" v-model="userId">
-    <Button @click="initWebpack">showAlert</Button>
+                    
                         <router-view 
                         	@sendContent="change" 
                         	v-bind:contentDate="offlineMsgList"
@@ -87,16 +79,19 @@
 </template>
 <script>
 import axios from 'axios'
+import qs from 'qs'
 export default {
      data () {
         return {
-        	websock : [],
-            userId : null,
+        	websock : [], 			//websocket连接
+            userId : '',			//登录用户ID
             isCollapsed: false,
-            contactList: {},
+            contactList: {},		//联系人列表
             msgCont : [],
-            messageConent : [],
-            offlineMsgList : []
+            messageConent : [],		//接受到的socket消息
+            offlineMsgList : [],	
+           	//--------------添加好友相关--------------
+            showAddFriend:false,	//显示添加好友界面
         }
     },
     computed: {
@@ -112,6 +107,9 @@ export default {
                 this.isCollapsed ? 'collapsed-menu' : ''
             ]
         }
+    },
+    watch : {
+    	
     },
     methods: {
     	getOfflineMessageList(userId){
@@ -166,47 +164,133 @@ export default {
 		    var self = this;
 		    //得到Message的JSon串
 		    var msg = $.parseJSON(e.data);
-		    self.getOfflineMessageList(self.userId);
-		    
-		    console.log("self.offlineMsgList");
-		    console.log(self.offlineMsgList);
 		    console.log(msg);
-		    //循环联系人
-		    $.each(self.contactList,function(indexs,item){
-		    	if(msg.from == item.userId){
-		    		self.messageConent = msg;
+		    //判断消息类型:5好友申请 6加群邀请 7加群申请
+		    if(msg.type == 5 || msg.type == 6 || msg.type == 7){
+		    	var title = '';
+		    	var content = ''
+		    	if(msg.type == 5){
+		    		title = '好友申请';
+		    		content = msg.fromName + ' 申请添加您为好友'
 		    	}
-		    	$.each(self.offlineMsgList,function(index,msgItem){
-		    		if(msgItem.fromUserId == item.userId){
-		    			if(item.notRead != null){
-		    			
-		    				if(self.offlineMsgList.length == 1){
+		    	if(msg.type == 6){
+		    		title = '加群邀请';
+		    		content = msg.fromName + ' 邀请你加入群'
+		    	}
+		    	if(msg.type == 7){
+		    		title = '加群申请';
+		    		content = msg.fromName + ' 申请入群'
+		    	}
+		    	this.$Notice.info({
+		    		name : msg.type+msg.from+msg.to[0],
+                    title: title,
+                    duration : 0,
+                    render: h => {
+                        return h('div', [ 
+                        	h('h3', content),
+                        	h('div', '附加信息：'+msg.content),
+                            h('Button',{
+                            	style : {
+                            		margin: '10px 7px -5px'
+                            	},
+                            	props : {
+                            		type : 'success'
+                            	},
+                            	on : {
+                            		click : ()=>{
+                            			self.actionManager(1,msg);
+                            		}
+                            	}
+                            }, '同意'),
+                            h('Button',{
+                            	style : {
+                            		margin: '10px 7px -5px'
+                            	},
+                            	props : {
+                            		type : 'primary'
+                            	},
+                            	on : {
+                            		click : ()=>{
+                            			self.actionManager(0,msg);
+                            		}
+                            	}
+                            }, '拒绝')
+                        ])
+                    }
+                });
+		    }else if(msg.type == 1){
+			    //离线信息
+			    self.getOfflineMessageList(self.userId);
+			    
+			    console.log("self.offlineMsgList");
+			    console.log(self.offlineMsgList);
+			    //循环联系人
+			    $.each(self.contactList,function(indexs,item){
+			    	if(msg.from == item.userId){
+			    		self.messageConent = msg;
+			    	}
+			    	$.each(self.offlineMsgList,function(index,msgItem){
+			    		if(msgItem.fromUserId == item.userId){
+			    			if(item.notRead != null){
+			    			
+			    				if(self.offlineMsgList.length == 1){
+				    				item.notRead = 1;
+			    				}
+			    				if(self.offlineMsgList.length > item.notRead){
+				    				item.notRead ++;
+			    				}
+			    			}else{
 			    				item.notRead = 1;
-		    				}
-		    				if(self.offlineMsgList.length > item.notRead){
-			    				item.notRead ++;
-		    				}
-		    			}else{
-		    				item.notRead = 1;
-		    			}
-		    		}
-		    	});
-		    	
-		    });
-		    console.log(self.messageConent);
-		    console.log(self.contactList);
-			self.$forceUpdate();		    
+			    			}
+			    		}
+			    	});
+			    	
+			    });
+			    console.log(self.messageConent);
+			    console.log(self.contactList);
+				self.$forceUpdate();
+				
+		    }else if(msg.type == -1){
+		    	console.log(msg);
+		    	this.showQuanJuMessage(msg);
+		    }
+		    		    
 		  },
 		  websocketclose(){  //关闭
 		    console.log("WebSocket关闭");
 		  },
 		  websocketerror(){  //失败
 		    console.log("WebSocket连接失败");
+		  },
+		  
+		  //添加好友（1通过，0拒绝）
+		  actionManager (type,msg) {
+		  	  if(msg.type == 5){
+				  this.$refs.addFriend.friendManager(type,msg) ; 		  
+		  	  }
+	  		  this.$Notice.close(msg.type+msg.from+msg.to[0]);
+		  },
+		  
+		  showQuanJuMessage (msg) {
+		  	this.$Message.success({
+		    		duration: 5,
+                    closable: true,
+                    render: h => {
+                        return h('span', [
+                            msg.content,
+                            h('a', 'render')
+                        ])
+                    }
+                });
+		  },
+		  testRouter (from, to) {
+		  	alert(from);
+		  		var url = '/message?toUserId=' + from + '&fromUserId=' + to;
+		  		this.$router.push({path: '/message', query:{toUserId:from,fromUserId:to}});
 		  }
     },
     mounted : function(){
     	this.initContact();
-    	//this.connect();
     }
 }
 </script>

@@ -118,4 +118,9 @@ public class UserServiceImpl implements UserService{
 		return userInfoMapper.updateUserInfo(userInfo);
 	}
 
+	@Override
+	public List<UserInfo> findByName(UserInfo userinfo) {
+		return userInfoMapper.findByName(userinfo);
+	}
+
 }

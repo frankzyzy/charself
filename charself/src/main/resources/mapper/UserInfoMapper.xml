@@ -45,4 +45,10 @@
 		select * from t_userInfo;
 	</select>
 	
+	<select id="findByName" parameterType="UserInfo" resultType="UserInfo">
+		select * from t_userInfo t 
+			where t.username LIKE "%"#{username}"%" OR t.nickname LIKE "%"#{nickname}"%"
+				
+	</select>
+	
 </mapper>

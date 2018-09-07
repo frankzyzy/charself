@@ -27,6 +27,8 @@ public interface UserService {
 
     List<User> findByPage(User user,Pageable pageable);
     
+    
+    
    /**************以下为个人信息相关操作*****************/ 
     /**
 	 * 第一次保存用户个人信息
@@ -48,4 +50,11 @@ public interface UserService {
 	 * @return
 	 */
 	int updateUserInfo(UserInfo userInfo);
+	
+	/**
+     * 根据用户名或者昵称查询用户信息列表
+     * @param user
+     * @return
+     */
+    List<UserInfo> findByName(UserInfo userinfo);
 }

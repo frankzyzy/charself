@@ -1,11 +1,14 @@
 package com.yzeng.charroom.entity;
 
+import java.util.Date;
+
 /**
  * 用户关系关联
  * @author Yao.Zeng
  * @version  [版本号, 2018年8月21日]
  */
 public class UserRelation {
+	private Integer id;
 	//用户A
 	private Integer userIdA;
 	//用户B
@@ -13,7 +16,7 @@ public class UserRelation {
 	//用户之间的关系状态 1：好友  0:黑名单
 	private int relationStatus;
 	//添加时间
-	private String relationTime;
+	private Date relationTime;
 	//用户A给用户B的备注名
 	private String memoName;
 	
@@ -41,14 +44,20 @@ public class UserRelation {
 	public void setRelationStatus(int relationStatus) {
 		this.relationStatus = relationStatus;
 	}
-	public String getRelationTime() {
+	public Date getRelationTime() {
 		return relationTime;
 	}
-	public void setRelationTime(String relationTime) {
+	public void setRelationTime(Date relationTime) {
 		this.relationTime = relationTime;
 	}
 	public UserRelation() {
 		super();
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
 	}
 	
 }

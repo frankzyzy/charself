@@ -5,6 +5,9 @@ import App from './App'
 import FriendsList from './components/FriendsList'
 import GroupList from './components/GroupList'
 import Message from './components/Message'
+import GroupMessage from './components/GroupMessage'
+import AddFriend from './components/AddFriend'
+import UserInfo from './components/UserInfo'
 import router from './router'
 
 import iView from 'iview'
@@ -16,6 +19,9 @@ Vue.use(iView)
 Vue.component("FriendsList",FriendsList)
 Vue.component("GroupList",GroupList)
 Vue.component("Message",Message)
+Vue.component("GroupMessage",GroupMessage)
+Vue.component("AddFriend",AddFriend)
+Vue.component("UserInfo",UserInfo)
 
 Vue.config.productionTip = false
 

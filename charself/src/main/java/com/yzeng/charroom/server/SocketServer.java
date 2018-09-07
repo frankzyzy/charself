@@ -151,17 +151,46 @@ public class SocketServer {
 	 */
     public void sendMessage(Message message) throws IOException {
     	Session toSession = userPool.get(message.getToUserId());
-    	//判断是否在线
-    	if(toSession != null && toSession.isOpen()) {
-    		message.setIsOffline("N");
-    		messageService.insertMsg(message);
-    		
-    		toSession.getBasicRemote().sendText(getMessage(message));
-    	}else {
-    		//将消息写到DB,标记为离线消息
-    		message.setIsOffline("Y");
-    		messageService.insertMsg(message);
-    	}
+    	switch (message.getMsgType()) {
+    	case -1://不给发送方（自己）发消息
+    		if(toSession != null && toSession.isOpen()) {
+	    		toSession.getBasicRemote().sendText(getMessage(message));
+	    	}
+			break;
+		case 1://普通消息
+			//判断是否在线
+	    	if(toSession != null && toSession.isOpen()) {
+	    		message.setIsOffline("N");
+	    		messageService.insertMsg(message);
+	    		
+	    		toSession.getBasicRemote().sendText(getMessage(message));
+	    	}else {
+	    		//将消息写到DB,标记为离线消息
+	    		message.setIsOffline("Y");
+	    		messageService.insertMsg(message);
+	    	}
+			break;
+		case 2:
+			
+			break;
+		case 3:
+			
+			break;
+		case 4:
+			
+			break;
+		case 5://好友申请信息
+			//判断是否在线
+	    	if(toSession != null && toSession.isOpen()) {
+	    		toSession.getBasicRemote().sendText(getMessage(message));
+	    	}
+			break;
+		case 6:
+			
+			break;
+		
+		}
+    	
     }
     
     public void sendMessageTo(String message, String To) throws IOException {  
@@ -203,9 +232,11 @@ public class SocketServer {
      */
 	public String getMessage(Message message){
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String fromName = userService.getUserInfoByUserId(message.getFromUserId()).getUsername();
 		//使用JSONObject方法构建Json数据
         JSONObject jsonObjectMessage = new JSONObject();
         jsonObjectMessage.put("from", String.valueOf(message.getFromUserId()));
+        jsonObjectMessage.put("fromName", fromName);
         jsonObjectMessage.put("to", new String[] {String.valueOf(message.getToUserId())});
         jsonObjectMessage.put("content", String.valueOf(message.getContent()));
         jsonObjectMessage.put("type", String.valueOf(message.getMsgType()));

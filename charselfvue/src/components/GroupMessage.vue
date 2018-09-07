@@ -1,9 +1,10 @@
 <template>
   <div class="message">
+  
   <Layout>
         <Layout>
             <Header :style="{padding: '0px', height: '40px', background: '#fff'}">
-            	{{userInfo.username}} 正在输入...{{receiveUserId}}
+            
             </Header>
             <Content :style="{padding: '0px', height: '300px', background: '#fff'}">
             	Content
@@ -35,7 +36,12 @@
             	<Button shape="circle" icon="ios-search" @click="sendMsg">发送</Button>
             </Footer>
         </Layout>
-        <Sider width='300' collapsible>Sider</Sider>
+        <Sider width='250' ref="side1" hide-trigger collapsible :style="{background: '#fff'}" v-model="isCollapsed">
+        	<Button>邀请好友</Button>
+        	<Table :columns="groupUserColumns" :data="groupUserInfo"></Table>
+        	<Icon @click.native="collapsedSider" :class="rotateIcon" style="float:right;padding-right:8px" type="md-menu" size="24"></Icon>
+        </Sider>
+        
     </Layout>
   </div>
 </template>
@@ -49,17 +55,46 @@ export default {
   name: 'Login',
   data () {
     return {
+      isCollapsed: false,
       ChatHistory:{},//聊天历史最后一页
       ChatHistoryMore:{},//聊天记录更多
       messageConents:[],
       pageNum : 0,
-      userInfo : {},
+      groupUserInfo : [], //群成员
       msgContent: '',
       message : [],
+      groupUserColumns:[
+      		{
+                title: '群成员',
+                key: 'userName',
+                render: (h, params) => {
+                	var self = this;
+                	return h('div',[
+                		h('a',{
+                			on : {
+                				click : ()=>{
+                					self.showUserInfo(params.row.userId)
+                        		}
+                			}
+                		},params.row.userName+' '),
+                		h('Badge',{
+                			props : {
+                				status : 'success',
+                				text : '在线',
+                				offset : [50,50]
+                			}
+                		})
+                	])
+                }
+            }
+      ]
     }
   },
-  props : ['contentDate','messageConent'],
+  props : [],
   methods : {
+  	 collapsedSider () {
+        this.$refs.side1.toggleCollapse();
+    },
   	handleReachTop () {
 	  		console.log("this.pageNum")
   		
@@ -72,42 +107,28 @@ export default {
             }, 2000);
         });
     },
-    showMessageContext (){
-    	console.log("messageConent");
-    	console.log(this.messageConent);
-    },
-    websocketonmessage(e){ //数据接收
-	    var self = this;
-	    console.log(e);
-	    var msg = $.parseJSON(e.data);
-	    console.log(msg);
-	  },
-  	//初始化；联系人信息，及状态
-  	initUserInfo () {
+ 	//显示用户详细信息
+ 	showUserInfo (userId) {
+ 		this.$Drawer({
+ 			render: h => {
+ 				return h('div','aaaaaaaaa')
+ 			}
+ 		})
+ 	},
+  	//初始化群成员信息；
+  	initGroupUserInfo () {
   	    var self = this;
-  	    //self.websockets.onmessage = self.websocketonmessage;
-  		axios.get('/user/get/'+this.receiveUserId)
+  		axios.get('/group/getGroupUser?groupId='+this.toGroupId)
   		.then(function(response){
-  			self.userInfo = response.data;
+  			self.groupUserInfo = response.data.data;
   		})
-  	},
-  	//去掉未读提醒
-  	removeMsgRemind () {
-  		self = this;
-  		for(let msg of self.contentDate){
-  			if(msg.from == self.sendUserId && msg.to == self.receiveUserId){
-  				msg.notRead = 0;
-  			}
-  		}
-  		console.log("self.contentDate")
-  		console.log(self.contentDate)
   	},
   	
   	//点击发送消息按钮方法
   	sendMsg () {
-  		this.message.type = 1;
+  		this.message.type = 2;
   		this.message.from = this.$route.query.fromUserId;
-  		this.message.to = this.receiveUserId;
+  		this.message.to = this.toGroupId;
   		this.message.content = this.msgContent;
   		this.messageConents.push({'content':this.msgContent,'from':this.message.from,'time':this.getDateFull(),'to':[this.message.to],'type':1});
   		this.$emit('sendContent',this.message);
@@ -172,8 +193,14 @@ export default {
   },
   
   computed: {
-	    receiveUserId () {
-	        return this.$route.query.toUserId;
+  		rotateIcon () {
+            return [
+                'menu-icon',
+                this.isCollapsed ? 'rotate-icon' : ''
+            ];
+        },
+	    toGroupId () {
+	        return this.$route.query.toGroupId;
 	    },
 	    sendUserId () {
 	        return this.$route.query.fromUserId;
@@ -181,39 +208,18 @@ export default {
   },
   
   watch : {
-  		receiveUserId (){
+  		toGroupId (){
   		   this.pageNum = 0;//切换聊天对象时清空记录页数
   		   this.ChatHistoryMore = {};//切换聊天对象时清空记录
-	       this.initUserInfo();
-	       this.initChatHistory();
-  		},
-  		
-  		contentDate : {
-  			handler(newValue, oldValue) {  
-		　　　　　　console.log("newValue")  
-		　　　　　　console.log(newValue)  
-	  			this.$forceUpdate();
-		　　　　}, 
-  		},
-  		//监听消息类型(type)
-  		messageConent (val){
-  			console.log("val");
-  			console.log(val)
-  			var type = val.type;
-  			//普通消息一对一
-  			if(type == 1){
-	  			this.addMsgContext(val);
-	  		//加好友消息
-  			}else if(type = 5){
-  				alert("ss");
-  			}
+	       this.initGroupUserInfo();
+	       //this.initChatHistory();
   		}
   },
   
   mounted : function(){
-	    this.initUserInfo();
-	    this.initChatHistory();
-	    this.removeMsgRemind();
+	    this.initGroupUserInfo();
+	    //this.initChatHistory();
+	    //this.removeMsgRemind();
   }
 }
 </script>
@@ -229,5 +235,11 @@ export default {
 }
 #messageContext ul li{
 	height : 50px;
+}
+.demo-drawer-profile{
+    font-size: 14px;
+}
+.demo-drawer-profile .ivu-col{
+    margin-bottom: 12px;
 }
 </style>
