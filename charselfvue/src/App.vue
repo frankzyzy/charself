@@ -38,7 +38,7 @@
                 	@sendmsg="sendmsg" />
             </Header>
             <Layout>
-                <Sider ref="side1" hide-trigger collapsible :style="{background: '#fff'}" v-model="isCollapsed">
+                <Sider width="201" ref="side1" hide-trigger collapsible :style="{background: '#fff'}" v-model="isCollapsed">
                 	<Tabs type="card" style="padding-left:7px">
 				        <TabPane label="好友" icon="ios-contact">
 				        	<FriendsList
@@ -64,7 +64,7 @@
                         <BreadcrumbItem>Components</BreadcrumbItem>
                         <BreadcrumbItem>Layout</BreadcrumbItem>
                     </Breadcrumb>-->
-                    <Content :style="{padding: '0px', minHeight: '1000', background: '#fff'}">
+                    <Content :style="{padding: '0px', minHeight: '1000', background: '#ebebeb'}">
                     
                         <router-view 
                         	@sendContent="change" 
@@ -250,9 +250,13 @@ export default {
 			    console.log(self.contactList);
 				self.$forceUpdate();
 				
+			//除自己消息	
 		    }else if(msg.type == -1){
 		    	console.log(msg);
 		    	this.showQuanJuMessage(msg);
+		    //群消息
+		    }else if(msg.type == 2){
+		    	self.messageConent = msg;
 		    }
 		    		    
 		  },

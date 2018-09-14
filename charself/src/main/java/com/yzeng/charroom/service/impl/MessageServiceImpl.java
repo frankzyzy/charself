@@ -28,6 +28,16 @@ public class MessageServiceImpl implements MessageService{
 
 	@Override
 	public List<Message> getMessageloggingList(Message message,int pageNum, int pageSize) {
+		//总页数
+		Integer pageCount = 0;
+		Integer totalCount = messageMapper.getMessageTotalCount(message);
+		if(totalCount%pageSize == 0) {
+			pageCount = totalCount/pageSize;
+		}else {
+			pageCount = (totalCount/pageSize) + 1;
+		}
+		//当前传入的页数，计算
+		pageNum = pageCount - pageNum;
 		PageHelper.startPage(pageNum, pageSize);
 		return messageMapper.getMessageloggingList(message);
 	}

@@ -3,40 +3,82 @@
   
   <Layout>
         <Layout>
-            <Header :style="{padding: '0px', height: '40px', background: '#fff'}">
-            
+            <Header :style="{padding: '0px', height: '40px', background: '#ebebeb'}">
+            	
             </Header>
-            <Content :style="{padding: '0px', height: '300px', background: '#fff'}">
-            	Content
-            	<div id="messageContext">
+            <Content :style="{padding: '0px', height: '300px', background: '#ebebeb'}">
             	<Scroll :height="250" id="msgUI" :on-reach-top="handleReachTop">
-            		<ul>
             			<template v-for="msgItem in ChatHistory" >
-	            			<li v-if="msgItem.toUserId == receiveUserId">
-	            				<div class="rightUI">{{msgItem}}</div>
-	            			</li>
-	            			<li v-else>
-	            				<div>{{msgItem}}</div>
-	            			</li>
+            				<!-- Right -->
+							<div v-if="msgItem.fromUserId == sendUserId" class="chat-receiver">
+							  <div><img src="https://i.loli.net/2017/08/21/599a521472424.jpg"></div>
+							  <div>{{msgItem.username}}</div>
+							  <div>
+							    <div class="chat-right_triangle"></div>
+							    <span> {{msgItem.content}}</span>
+							  </div>
+							</div>
+            				<!-- Left -->
+	            			<div v-else class="chat-sender">
+							  <div><img src="https://i.loli.net/2017/08/21/599a521472424.jpg"></div>
+							  <div>{{msgItem.username}}</div>
+							  <div>
+							    <div class="chat-left_triangle"></div>
+							    <span> {{msgItem.content}}</span>
+							  </div>
+							</div>
             			</template>
+            			
+            			<template v-for="msgItem in ChatHistoryCurrent" >
+            				<!-- Right -->
+							<div v-if="msgItem.fromUserId == sendUserId" class="chat-receiver">
+							  <div><img src="https://i.loli.net/2017/08/21/599a521472424.jpg"></div>
+							  <div>{{msgItem.username}}</div>
+							  <div>
+							    <div class="chat-right_triangle"></div>
+							    <span> {{msgItem.content}}</span>
+							  </div>
+							</div>
+            				<!-- Left -->
+	            			<div v-else class="chat-sender">
+							  <div><img src="https://i.loli.net/2017/08/21/599a521472424.jpg"></div>
+							  <div>{{msgItem.username}}</div>
+							  <div>
+							    <div class="chat-left_triangle"></div>
+							    <span> {{msgItem.content}}</span>
+							  </div>
+							</div>
+            			</template>
+            			
             			<template v-for="msgItem in messageConents" >
-	            			<li v-if="msgItem.to[0] == receiveUserId">
-	            				<div class="rightUI">{{msgItem}}</div>
-	            			</li>
-	            			<li v-else>
-	            				<div>{{msgItem}}</div>
-	            			</li>
+            				<!-- Right -->
+							<div v-if="msgItem.from == sendUserId" class="chat-receiver">
+							  <div><img src="https://i.loli.net/2017/08/21/599a521472424.jpg"></div>
+							  <div>{{msgItem.username}}</div>
+							  <div>
+							    <div class="chat-right_triangle"></div>
+							    <span> {{msgItem.content}}</span>
+							  </div>
+							</div>
+            				<!-- Left -->
+	            			<div v-else class="chat-sender">
+							  <div><img src="https://i.loli.net/2017/08/21/599a521472424.jpg"></div>
+							  <div>{{msgItem.username}}</div>
+							  <div>
+							    <div class="chat-left_triangle"></div>
+							    <span> {{msgItem.content}}</span>
+							  </div>
+							</div>
             			</template>
-            		</ul>
+            			
             	</Scroll>
-            	</div>
             </Content>
             <Footer :style="{padding: '0px',  background: '#fff'}">
             	<Input v-model="msgContent" type="textarea" :rows="4" placeholder="Enter something..." />
             	<Button shape="circle" icon="ios-search" @click="sendMsg">发送</Button>
             </Footer>
         </Layout>
-        <Sider width='250' ref="side1" hide-trigger collapsible :style="{background: '#fff'}" v-model="isCollapsed">
+        <Sider width='170' ref="side1" hide-trigger collapsible :style="{background: '#fff'}" v-model="isCollapsed">
         	<Button>邀请好友</Button>
         	<Table :columns="groupUserColumns" :data="groupUserInfo"></Table>
         	<Icon @click.native="collapsedSider" :class="rotateIcon" style="float:right;padding-right:8px" type="md-menu" size="24"></Icon>
@@ -56,8 +98,9 @@ export default {
   data () {
     return {
       isCollapsed: false,
-      ChatHistory:{},//聊天历史最后一页
-      ChatHistoryMore:{},//聊天记录更多
+      ChatHistoryCurrent:{},//聊天历史最后一页
+      ChatHistory:{},//聊天历史
+      ChatHistoryMore:{},//聊天记录暂存更多
       messageConents:[],
       pageNum : 0,
       groupUserInfo : [], //群成员
@@ -69,18 +112,25 @@ export default {
                 key: 'userName',
                 render: (h, params) => {
                 	var self = this;
+                	var row = params.row;
+                	var status = 'success';
+                	var statusStr = '在线';
+                	if(row.isOnline != 1){
+                		status = 'default';
+                		statusStr = '离线';
+                	}
                 	return h('div',[
                 		h('a',{
                 			on : {
                 				click : ()=>{
-                					self.showUserInfo(params.row.userId)
+                					self.showUserInfo(row.userId)
                         		}
                 			}
-                		},params.row.userName+' '),
+                		},[h('Avatar',{props:{src:'https://i.loli.net/2017/08/21/599a521472424.jpg'}}),h('span',params.row.userName+' ')]),
                 		h('Badge',{
                 			props : {
-                				status : 'success',
-                				text : '在线',
+                				status : status,
+                				text : statusStr,
                 				offset : [50,50]
                 			}
                 		})
@@ -90,7 +140,7 @@ export default {
       ]
     }
   },
-  props : [],
+  props : ['messageConent'],
   methods : {
   	 collapsedSider () {
         this.$refs.side1.toggleCollapse();
@@ -107,13 +157,10 @@ export default {
             }, 2000);
         });
     },
- 	//显示用户详细信息
- 	showUserInfo (userId) {
- 		this.$Drawer({
- 			render: h => {
- 				return h('div','aaaaaaaaa')
- 			}
- 		})
+ 	//初始化群信息
+ 	initGroupInfo () {
+ 		var self = this;
+ 		axios.get('/group/')
  	},
   	//初始化群成员信息；
   	initGroupUserInfo () {
@@ -132,47 +179,39 @@ export default {
   		this.message.content = this.msgContent;
   		this.messageConents.push({'content':this.msgContent,'from':this.message.from,'time':this.getDateFull(),'to':[this.message.to],'type':1});
   		this.$emit('sendContent',this.message);
-  		self.$forceUpdate();
   	},
   	//初始化聊天记录
   	initChatHistory () {
   		var self = this;
-  		axios.post('/msg/getMsgHistory',qs.stringify({
-  			fromUserId : self.sendUserId,
-  			toUserId : self.receiveUserId,
+  		axios.post('/group/getGroupMsgHistory',qs.stringify({
+  			groupId : self.toGroupId,
   			pageSize : 10,
   			pageNum : self.pageNum
   		}))
   		.then(function(response){
-  			if(self.pageNum == 0){
-  				self.ChatHistory = response.data;
-	  			$.each(self.ChatHistory,function(){
-	  				this.sendMsgTime = hssduc.util.DateUtils.formatTimeStamp(this.sendMsgTime,"yyyy-MM-dd HH:mm:ss")
-	  			})
-  			}else{
-	  			self.ChatHistory = self.ChatHistoryMore;
-	  			self.ChatHistoryMore = response.data;
-	  			Array.prototype.push.apply(self.ChatHistoryMore, self.ChatHistory);
-	  			self.ChatHistory = self.ChatHistoryMore;
-	  			$.each(self.ChatHistory,function(){
-	  				this.sendMsgTime = hssduc.util.DateUtils.formatTimeStamp(this.sendMsgTime,"yyyy-MM-dd HH:mm:ss")
-	  			})
+  			var charData = response.data;
+  			if(charData.code == 1){
+  				if(self.pageNum == 0){
+	  				self.ChatHistoryCurrent = charData.data;
+	  			}else{
+		  			self.ChatHistory = self.ChatHistoryMore;
+		  			self.ChatHistoryMore = charData.data;
+		  			Array.prototype.push.apply(self.ChatHistoryMore, self.ChatHistory);
+		  			self.ChatHistory = self.ChatHistoryMore;
+	  			}
+  			}else if (charData.code == 2 && self.pageNum != 0) {
+  				self.$Message.info({
+                    render: h => {
+                        return h('span', charData.msg)
+                    }
+                });
   			}
+  			
   		})
   	},
   	//将接受的信息放到记录中显示
   	addMsgContext (val){
-  	    //var html = '<li>from:'+val.from + val.time + val.content+ '</li>'
-  		//$("#addMsgContext").append(html);
   		this.messageConents.push(val);
-		this.$nextTick(() => {
-	  		var div = document.getElementById('msgUI');
-	  		console.log(div);
-	  		console.log(div.scrollTop);
-	  		console.log(div.scrollHeight);
-		    div.scrollTop = div.scrollHeight;
-     	})
-      
   	},
   	//获得当前时间
   	getDateFull() {
@@ -210,15 +249,25 @@ export default {
   watch : {
   		toGroupId (){
   		   this.pageNum = 0;//切换聊天对象时清空记录页数
+  		   this.ChatHistory = {};//切换聊天对象时清空记录
   		   this.ChatHistoryMore = {};//切换聊天对象时清空记录
+  		   this.ChatHistoryCurrent = {};//切换聊天对象时清空记录
+  		   this.messageConents = [];
+  		   this.initGroupInfo();
 	       this.initGroupUserInfo();
-	       //this.initChatHistory();
+	       this.initChatHistory();
+  		},
+  		
+  		//监听消息类型(type)
+  		messageConent (val){
+	  		this.addMsgContext(val);
   		}
   },
   
   mounted : function(){
+  		this.initGroupInfo();
 	    this.initGroupUserInfo();
-	    //this.initChatHistory();
+	    this.initChatHistory();
 	    //this.removeMsgRemind();
   }
 }
@@ -226,20 +275,96 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.message{
-    width : 100%;
-    height : 100%;
-}
-.rightUI{
-	float:right
-}
-#messageContext ul li{
-	height : 50px;
-}
-.demo-drawer-profile{
-    font-size: 14px;
-}
-.demo-drawer-profile .ivu-col{
-    margin-bottom: 12px;
-}
+body{
+      background-color: #ebebeb;
+      font-family: -apple-system;
+      font-family: "-apple-system", "Helvetica Neue", "Roboto", "Segoe UI", sans-serif;
+    }
+.chat-sender{
+      clear:both;
+      font-size: 80%;
+    }
+    .chat-sender div:nth-of-type(1){
+      float: left;
+    }
+    .chat-sender div:nth-of-type(2){
+      margin: 0 50px 2px 50px;
+      padding: 0px;
+      color: #848484;
+      font-size: 70%;
+      text-align: left;
+    }
+    .chat-sender div:nth-of-type(3){
+      background-color: white;
+      /*float: left;*/
+      margin: 0 50px 10px 50px;
+      padding: 10px 10px 10px 10px;
+      border-radius:7px;
+      text-indent: -12px;
+    }
+
+    .chat-receiver{
+      clear:both;
+      font-size: 80%;
+    }
+    .chat-receiver div:nth-of-type(1){
+      float: right;
+    }
+    .chat-receiver div:nth-of-type(2){
+      margin: 0px 50px 2px 50px;
+      padding: 0px;
+      color: #848484;
+      font-size: 70%;
+      text-align: right;
+    }
+    .chat-receiver div:nth-of-type(3){
+      /*float:right;*/
+      background-color: #b2e281;
+      margin: 0px 50px 10px 50px;
+      padding: 10px 10px 10px 10px;
+      border-radius:7px;
+    }
+
+    .chat-receiver div:first-child img,
+    .chat-sender div:first-child img{
+      width: 40px;
+      height: 40px;
+      /*border-radius: 10%;*/
+    }
+
+    .chat-left_triangle{
+      height: 0px;
+      width: 0px;
+      border-width: 6px;
+      border-style: solid;
+      border-color: transparent white transparent transparent;
+      position: relative;
+      left: -22px;
+      top: 3px;
+    }
+    .chat-right_triangle{
+      height: 0px;
+      width: 0px;
+      border-width: 6px;
+      border-style: solid;
+      border-color: transparent transparent transparent #b2e281;
+      position: relative;
+      right:-22px;
+      top:3px;
+    }
+
+    .chat-notice{
+      clear: both;
+      font-size: 70%;
+      color: white;
+      text-align: center;
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+    .chat-notice span{
+      background-color: #cecece;
+      line-height: 25px;
+      border-radius: 5px;
+      padding: 5px 10px;
+    }
 </style>

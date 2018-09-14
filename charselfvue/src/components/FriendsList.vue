@@ -7,7 +7,7 @@
             </template>
             <template v-for="(item,index) in friendsList">
                 	<MenuItem :name="'1-'+(index+1)" :to="{path:'/message/',query:{toUserId:item.userId,fromUserId:loginUserId}}">
-                		{{item.username}}{{item.notRead}}
+                		<Avatar src="https://i.loli.net/2017/08/21/599a521472424.jpg" />&nbsp;{{item.username}}{{item.notRead}}
                 	</MenuItem>
             </template>
             <MenuItem name="1-6">Option 3</MenuItem>

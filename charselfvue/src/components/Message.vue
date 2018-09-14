@@ -18,6 +18,14 @@
 	            				<div>{{msgItem}}</div>
 	            			</li>
             			</template>
+            			<template v-for="msgItem in ChatHistoryCurrent" >
+	            			<li v-if="msgItem.toUserId == receiveUserId">
+	            				<div class="rightUI">{{msgItem}}</div>
+	            			</li>
+	            			<li v-else>
+	            				<div>{{msgItem}}</div>
+	            			</li>
+            			</template>
             			<template v-for="msgItem in messageConents" >
 	            			<li v-if="msgItem.to[0] == receiveUserId">
 	            				<div class="rightUI">{{msgItem}}</div>
@@ -49,8 +57,9 @@ export default {
   name: 'Login',
   data () {
     return {
-      ChatHistory:{},//聊天历史最后一页
-      ChatHistoryMore:{},//聊天记录更多
+      ChatHistoryCurrent:{},//聊天历史最后一页
+      ChatHistory:{},//聊天历史
+      ChatHistoryMore:{},//聊天记录暂存更多
       messageConents:[],
       pageNum : 0,
       userInfo : {},
@@ -111,7 +120,6 @@ export default {
   		this.message.content = this.msgContent;
   		this.messageConents.push({'content':this.msgContent,'from':this.message.from,'time':this.getDateFull(),'to':[this.message.to],'type':1});
   		this.$emit('sendContent',this.message);
-  		self.$forceUpdate();
   	},
   	//初始化聊天记录
   	initChatHistory () {
@@ -124,8 +132,8 @@ export default {
   		}))
   		.then(function(response){
   			if(self.pageNum == 0){
-  				self.ChatHistory = response.data;
-	  			$.each(self.ChatHistory,function(){
+  				self.ChatHistoryCurrent = response.data;
+	  			$.each(self.ChatHistoryCurrent,function(){
 	  				this.sendMsgTime = hssduc.util.DateUtils.formatTimeStamp(this.sendMsgTime,"yyyy-MM-dd HH:mm:ss")
 	  			})
   			}else{
@@ -183,7 +191,10 @@ export default {
   watch : {
   		receiveUserId (){
   		   this.pageNum = 0;//切换聊天对象时清空记录页数
+  		   this.ChatHistory = {};//切换聊天对象时清空记录
   		   this.ChatHistoryMore = {};//切换聊天对象时清空记录
+  		   this.ChatHistoryCurrent = {};//切换聊天对象时清空记录
+  		   this.messageConents = [];//
 	       this.initUserInfo();
 	       this.initChatHistory();
   		},

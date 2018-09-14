@@ -87,4 +87,24 @@ public class GroupController {
 		}
 		return wr;
 	}
+	
+	@RequestMapping("getGroupMsgHistory")
+	@ResponseBody
+	public WebResult getGroupMsgHistory(Integer groupId,Integer pageNum, Integer pageSize) {
+		WebResult wr = new WebResult();
+		try {
+			List<Map<String,Object>> groupMsg = groupService.getGroupMsgHistory(groupId,pageNum,pageSize);
+			if(groupMsg != null && groupMsg.size() > 0) {
+				wr.setData(groupMsg);
+				wr.setCode("1");
+			}else {
+				wr.setCode("2");
+				wr.setMsg("没有更多信息记录了");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			wr.invokeFail("拉取群消息失败！");
+		}
+		return wr;
+	}
 }

@@ -26,6 +26,7 @@ import com.yzeng.charroom.entity.Message;
 import com.yzeng.charroom.entity.User;
 import com.yzeng.charroom.entity.UserInfo;
 import com.yzeng.charroom.mapper.MessageMapper;
+import com.yzeng.charroom.service.GroupService;
 import com.yzeng.charroom.service.MessageService;
 import com.yzeng.charroom.service.UserService;
 
@@ -53,6 +54,7 @@ public class SocketServer {
 	//你要注入的service或者dao
 	private UserService userService;
 	private MessageService messageService;
+	private GroupService groupService;
 	
 	/**
     * 用户连接时触发
@@ -62,8 +64,10 @@ public class SocketServer {
 	@OnOpen
 	public void open(Session session,@PathParam(value="userId")Integer userId) {
 		this.session = session;
+		
 		userService = applicationContext.getBean(UserService.class);
 		messageService = applicationContext.getBean(MessageService.class);
+		groupService = applicationContext.getBean(GroupService.class);
 		
 		//获得登录用户个人信息
 		user = userService.getUserInfoByUserId(userId);
@@ -170,8 +174,21 @@ public class SocketServer {
 	    		messageService.insertMsg(message);
 	    	}
 			break;
-		case 2:
-			
+		case 2://群信息
+			message.setIsOffline("N");
+			messageService.insertMsg(message);
+			//查询该群所有成员-遍历-给登录的用户发送消息
+			List<Map<String,Object>> list = groupService.getGroupUserByGroupId(message.getToUserId());
+			for (Map<String, Object> map : list) {
+				int userId = Integer.parseInt(map.get("userId").toString());
+				//不包括自己
+				if(userId != message.getFromUserId()) {
+					Session sessionUser = userPool.get(userId);
+					if(sessionUser != null && sessionUser.isOpen()) {
+						sessionUser.getBasicRemote().sendText(getMessage(message));
+					}
+				}
+			}
 			break;
 		case 3:
 			

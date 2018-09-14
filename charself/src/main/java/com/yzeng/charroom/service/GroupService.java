@@ -42,4 +42,18 @@ public interface GroupService {
 	 * @return
 	 */
 	List<Map<String, Object>> getGroupUserByGroupId(Integer groupId);
+	
+	/**
+	 * 查询群信息总数
+	 * @param groupId
+	 * @return
+	 */
+	Integer getGroupMsgCount(Integer groupId);
+	
+	/**
+	 * 查询群消息
+	 * @param groupId
+	 * @return
+	 */
+	List<Map<String, Object>> getGroupMsgHistory(Integer groupId,int pageNum, int pageSize);
 }

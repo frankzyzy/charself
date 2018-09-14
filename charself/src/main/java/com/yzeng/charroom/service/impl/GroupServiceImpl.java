@@ -1,5 +1,6 @@
 package com.yzeng.charroom.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.github.pagehelper.PageHelper;
 import com.yzeng.charroom.entity.Group;
 import com.yzeng.charroom.mapper.GroupMapper;
 import com.yzeng.charroom.service.GroupService;
@@ -42,6 +44,32 @@ public class GroupServiceImpl implements GroupService{
 	@Override
 	public int addUserToGroup(Integer groupId, Integer userId) {
 		return groupMapper.addUserToGroup(groupId, userId);
+	}
+
+	@Override
+	public List<Map<String, Object>> getGroupMsgHistory(Integer groupId,int pageNum, int pageSize) {
+		//总页数
+		Integer pageCount = 0;
+		//总记录数
+		Integer totalCount = groupMapper.getGroupMsgCount(groupId);
+		if(totalCount%pageSize == 0) {
+			pageCount = totalCount/pageSize;
+		}else {
+			pageCount = (totalCount/pageSize) + 1;
+		}
+		//当前传入的页数，计算
+		pageNum = pageCount - pageNum;
+		if(pageNum <= 0) {
+			return new ArrayList<Map<String, Object>>();
+		}
+		PageHelper.startPage(pageNum, pageSize);
+		return groupMapper.getGroupMsg(groupId);
+	}
+
+	@Override
+	public Integer getGroupMsgCount(Integer groupId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	
