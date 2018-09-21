@@ -9,32 +9,69 @@
             	Content
             	<div id="messageContext">
             	<Scroll :height="250" id="msgUI" :on-reach-top="handleReachTop">
-            		<ul>
-            			<template v-for="msgItem in ChatHistory" >
-	            			<li v-if="msgItem.toUserId == receiveUserId">
-	            				<div class="rightUI">{{msgItem}}</div>
-	            			</li>
-	            			<li v-else>
-	            				<div>{{msgItem}}</div>
-	            			</li>
-            			</template>
-            			<template v-for="msgItem in ChatHistoryCurrent" >
-	            			<li v-if="msgItem.toUserId == receiveUserId">
-	            				<div class="rightUI">{{msgItem}}</div>
-	            			</li>
-	            			<li v-else>
-	            				<div>{{msgItem}}</div>
-	            			</li>
-            			</template>
-            			<template v-for="msgItem in messageConents" >
-	            			<li v-if="msgItem.to[0] == receiveUserId">
-	            				<div class="rightUI">{{msgItem}}</div>
-	            			</li>
-	            			<li v-else>
-	            				<div>{{msgItem}}</div>
-	            			</li>
-            			</template>
-            		</ul>
+            		<template v-for="msgItem in ChatHistory" >
+	            		<!-- Right -->
+						<div v-if="msgItem.toUserId == receiveUserId" class="chat-receiver">
+						  <div><img src="https://i.loli.net/2017/08/21/599a521472424.jpg"></div>
+						  <div>{{msgItem.username}}</div>
+						  <div>
+						    <div class="chat-right_triangle"></div>
+						    <span> {{msgItem.content}}</span>
+						  </div>
+						</div>
+						<!-- Left -->
+            			<div v-else class="chat-sender">
+						  <div><img src="https://i.loli.net/2017/08/21/599a521472424.jpg"></div>
+						  <div>{{msgItem.username}}</div>
+						  <div>
+						    <div class="chat-left_triangle"></div>
+						    <span> {{msgItem.content}}</span>
+						  </div>
+						</div>
+        			</template>
+        			
+            		<template v-for="msgItem in ChatHistoryCurrent" >
+	            		<!-- Right -->
+						<div v-if="msgItem.toUserId == receiveUserId" class="chat-receiver">
+						  <div><img src="https://i.loli.net/2017/08/21/599a521472424.jpg"></div>
+						  <div>{{msgItem.username}}</div>
+						  <div>
+						    <div class="chat-right_triangle"></div>
+						    <span> {{msgItem.content}}</span>
+						  </div>
+						</div>
+						<!-- Left -->
+            			<div v-else class="chat-sender">
+						  <div><img src="https://i.loli.net/2017/08/21/599a521472424.jpg"></div>
+						  <div>{{msgItem.username}}</div>
+						  <div>
+						    <div class="chat-left_triangle"></div>
+						    <span> {{msgItem.content}}</span>
+						  </div>
+						</div>
+        			</template>
+        			
+            		<template v-for="msgItem in messageConents" >
+	            		<!-- Right -->
+						<div v-if="msgItem.toUserId == receiveUserId" class="chat-receiver">
+						  <div><img src="https://i.loli.net/2017/08/21/599a521472424.jpg"></div>
+						  <div>{{msgItem.username}}</div>
+						  <div>
+						    <div class="chat-right_triangle"></div>
+						    <span> {{msgItem.content}}</span>
+						  </div>
+						</div>
+						<!-- Left -->
+            			<div v-else class="chat-sender">
+						  <div><img src="https://i.loli.net/2017/08/21/599a521472424.jpg"></div>
+						  <div>{{msgItem.username}}</div>
+						  <div>
+						    <div class="chat-left_triangle"></div>
+						    <span> {{msgItem.content}}</span>
+						  </div>
+						</div>
+        			</template>
+            			
             	</Scroll>
             	</div>
             </Content>
