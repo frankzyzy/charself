@@ -1,12 +1,18 @@
 package com.yzeng.charme.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class User {
+public class User implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Integer id;
 	private String username;
 	private String password;
+	private String salt;
 	private Date registertime;
 	private Date lastTime;
 	private String lastIp;
@@ -69,6 +75,16 @@ public class User {
 	}
 	public void setMsg(List<Message> msg) {
 		this.msg = msg;
+	}
+
+
+	public String getSalt() {
+		return salt;
+	}
+
+
+	public void setSalt(String salt) {
+		this.salt = salt;
 	}
 	
 }

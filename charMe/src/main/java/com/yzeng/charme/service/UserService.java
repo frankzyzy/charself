@@ -11,6 +11,18 @@ import com.yzeng.charme.entity.UserInfo;
 public interface UserService {
 	public User getNameById(User user);
 	
+	/**
+	 * 用户注册
+	 * @param user
+	 * @return
+	 */
+	Map<String,String> register(User user);
+	
+	/**
+	 * 用户登录
+	 * @param user
+	 * @return
+	 */
 	Map<String,Object> login(User user);
 
 	List<UserInfo> findAll();

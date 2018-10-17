@@ -3,15 +3,20 @@
  
 <mapper namespace="com.yzeng.charme.mapper.UserMapper">
  
+ 	<select id="getUserByName" parameterType="STRING" resultType="User">
+ 		select * from t_user where username = #{username}
+ 	</select>
+ 
  
 	<select id="getNameById" parameterType="User" resultType="User">
 		SELECT * FROM t_user WHERE ID = #{id}
 	</select>
 	
 	<insert id="insertUser" parameterType="User" useGeneratedKeys="true" keyProperty="id">
-		insert into t_user(username,password,registertime,lastTime) 
+		insert into t_user(username,password,salt,registertime,lastTime) 
 			values(#{username,jdbcType=VARCHAR},
 				   #{password,jdbcType=VARCHAR},
+				   #{salt,jdbcType=VARCHAR},
 				   #{registertime,jdbcType=TIMESTAMP},
 				   #{lastTime,jdbcType=TIMESTAMP}
 				  )

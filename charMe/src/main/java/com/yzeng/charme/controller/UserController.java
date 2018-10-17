@@ -23,6 +23,7 @@ import com.yzeng.charme.entity.Message;
 import com.yzeng.charme.entity.User;
 import com.yzeng.charme.entity.UserInfo;
 import com.yzeng.charme.service.UserService;
+import com.yzeng.charme.utils.WebResult;
 
 @Controller
 @RequestMapping("user")
@@ -31,6 +32,18 @@ public class UserController {
 	@Autowired
     private UserService userService;
 
+	@RequestMapping(value="register")
+	public WebResult register(String username,String password) {
+		WebResult wr = new WebResult();
+		User user = new User();
+		user.setUsername(username);
+		user.setPassword(password);
+		Map<String, String> map = userService.register(user);
+		wr.setData(map);
+		return wr;
+	}
+	
+	
 	@RequestMapping("login")
 	public String login(String username,String password,HttpSession session) {
 		User user = new User();
